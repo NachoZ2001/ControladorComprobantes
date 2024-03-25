@@ -1,4 +1,5 @@
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,6 +14,12 @@ namespace Comparador
         public Form1()
         {
             InitializeComponent();
+
+            // Establecer el estilo del borde y deshabilitar el cambio de tamaño
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+
+            // Establecer el tamaño mínimo y máximo para evitar el cambio de tamaño
+            this.MinimumSize = this.MaximumSize = this.Size;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -64,6 +71,8 @@ namespace Comparador
             var diccionarioAFIP = ArmarDiccionarioAFIP(rutaExcelAfip);
 
             CompararYMarcarFilas(diccionarioHolistor, diccionarioAFIP, rutaExcelHolistor, rutaExcelAfip);
+
+            MarcarNoSeñalizadosEnRojo(rutaExcelAfip);
         }
 
         // Función para obtener el índice de una columna específica
@@ -127,10 +136,10 @@ namespace Comparador
             return Regex.Replace(cuit, @"[^\d]", "");
         }
 
-        // Función para armar el diccionario de Holistor
-        static Dictionary<string, List<(int, double, double, double, string)>> ArmarDiccionarioHolistor(string rutaExcel)
+        // Función para armar el diccionario de Holistor --> {CUIT}: (fila, neto, iva, total, comprobante)
+        static Dictionary<string, List<(int, double, double, string)>> ArmarDiccionarioHolistor(string rutaExcel)
         {
-            var diccionario = new Dictionary<string, List<(int, double, double, double, string)>>();
+            var diccionario = new Dictionary<string, List<(int, double, double, string)>>();
 
             using (var workbook = new XLWorkbook(rutaExcel))
             {
@@ -147,12 +156,6 @@ namespace Comparador
 
                         // Procesar el número de comprobante
                         numeroComprobante = ProcesarNumeros(numeroComprobante);
-
-                        // Obtener valor de la columna Neto
-                        int indiceColumnaNeto = ObtenerIndiceColumna(worksheet, "Neto");
-                        string valorCeldaNeto = worksheet.Cell(fila, indiceColumnaNeto).GetString();
-                        string valorCeldaNetoSinComa = valorCeldaNeto.Replace(",", ".");
-                        double neto = double.Parse(valorCeldaNetoSinComa, CultureInfo.InvariantCulture);
 
                         // Obtener valor de la columna IVA
                         int indiceColumnaIVA = ObtenerIndiceColumna(worksheet, "IVA");
@@ -174,10 +177,10 @@ namespace Comparador
                         // Agregar al diccionario
                         if (!diccionario.ContainsKey(cuit))
                         {
-                            diccionario[cuit] = new List<(int, double, double, double, string)>();
+                            diccionario[cuit] = new List<(int, double, double, string)>();
                         }
 
-                        diccionario[cuit].Add((fila, neto, iva, total, numeroComprobante)); 
+                        diccionario[cuit].Add((fila, iva, total, numeroComprobante)); 
                     }
                 }
                 else
@@ -189,22 +192,21 @@ namespace Comparador
             return diccionario;
         }
 
-        // Función para armar el diccionario de AFIP
-        static Dictionary<string, List<(int, double, double, double, string)>> ArmarDiccionarioAFIP(string rutaExcel)
+        // Función para armar el diccionario de AFIP --> {CUIT}: (fila, neto, iva, total, comprobante)
+        static Dictionary<string, List<(int, double, double, string)>> ArmarDiccionarioAFIP(string rutaExcel)
         {
-            var diccionario = new Dictionary<string, List<(int, double, double, double, string)>>();
+            var diccionario = new Dictionary<string, List<(int, double, double, string)>>();
 
             using (var workbook = new XLWorkbook(rutaExcel))
             {
                 var worksheet = workbook.Worksheet(1); // Supongamos que los datos están en la primera hoja
                 int indiceColumnaPuntoVenta = ObtenerIndiceColumna(worksheet, "Punto de Venta");
                 int indiceColumnaComprobante = ObtenerIndiceColumna(worksheet, "Número Desde");
-                int indiceColumnaNeto = ObtenerIndiceColumna(worksheet, "Imp. Neto Gravado");
                 int indiceColumnaIVA = ObtenerIndiceColumna(worksheet, "IVA");
                 int indiceColumnaTotal = ObtenerIndiceColumna(worksheet, "Imp. Total");
                 int indiceColumnaCuit = ObtenerIndiceColumna(worksheet, "Nro. Doc. Emisor");
 
-                if (indiceColumnaPuntoVenta != -1 && indiceColumnaComprobante != -1 && indiceColumnaNeto != -1 && indiceColumnaIVA != -1 && indiceColumnaTotal != -1 && indiceColumnaCuit != -1)
+                if (indiceColumnaPuntoVenta != -1 && indiceColumnaComprobante != -1 && indiceColumnaIVA != -1 && indiceColumnaTotal != -1 && indiceColumnaCuit != -1)
                 {
                     int ultimaFila = worksheet.LastRowUsed().RowNumber();
 
@@ -213,15 +215,6 @@ namespace Comparador
                         string puntoVenta = worksheet.Cell(fila, indiceColumnaPuntoVenta).Value.ToString();
                         string numeroComprobante = worksheet.Cell(fila, indiceColumnaComprobante).Value.ToString();
                         string comprobanteCompleto = puntoVenta + numeroComprobante;
-
-                        // Obtener valor de la columna Neto
-                        string valorCeldaNeto = worksheet.Cell(fila, indiceColumnaNeto).GetString();
-                        string valorCeldaNetoSinComa = valorCeldaNeto.Replace(",", ".");
-                        double neto = 0;
-                        if (valorCeldaNetoSinComa != "")
-                        {
-                            neto = double.Parse(valorCeldaNetoSinComa, CultureInfo.InvariantCulture);
-                        }
 
                         // Obtener valor de la columna IVA
                         string valorCeldaIVA = worksheet.Cell(fila, indiceColumnaIVA).GetString();
@@ -243,10 +236,10 @@ namespace Comparador
                         // Agregar al diccionario
                         if (!diccionario.ContainsKey(cuit))
                         {
-                            diccionario[cuit] = new List<(int, double, double, double, string)>();
+                            diccionario[cuit] = new List<(int, double, double, string)>();
                         }
 
-                        diccionario[cuit].Add((fila, neto, iva, total, comprobanteCompleto));
+                        diccionario[cuit].Add((fila, iva, total, comprobanteCompleto));
                     }
                 }
                 else
@@ -258,7 +251,7 @@ namespace Comparador
             return diccionario;
         }
 
-        static void CompararYMarcarFilas(Dictionary<string, List<(int, double, double, double, string)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, double, string)>> diccionarioAFIP, string rutaExcelHolistor, string rutaExcelAFIP)
+        static void CompararYMarcarFilas(Dictionary<string, List<(int, double, double, string)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string)>> diccionarioAFIP, string rutaExcelHolistor, string rutaExcelAFIP)
         {
             using (var workbookHolistor = new XLWorkbook(rutaExcelHolistor))
             using (var workbookAFIP = new XLWorkbook(rutaExcelAFIP))
@@ -269,31 +262,33 @@ namespace Comparador
                     string claveHolistor = kvpHolistor.Key;
                     var registrosHolistor = kvpHolistor.Value;
 
-                    // Verificar si la clave existe en el diccionario de AFIP
+                    // Verificar si la clave existe en el diccionario de AFIP                   
                     if (diccionarioAFIP.ContainsKey(claveHolistor))
                     {
                         var registrosAFIP = diccionarioAFIP[claveHolistor];
 
                         foreach (var registroHolistor in registrosHolistor)
                         {
+                            // Bandera para señalizar si se encontro o no
+                            int ban = 0;
+
                             foreach (var registroAFIP in registrosAFIP)
                             {
                                 // Comparar los valores de neto, iva, total y comprobante
-                                if (Math.Abs(registroHolistor.Item2 - registroAFIP.Item2) <= 5 &&
-                                    Math.Abs(registroHolistor.Item3 - registroAFIP.Item3) <= 5 &&
-                                    Math.Abs(registroHolistor.Item4 - registroAFIP.Item4) <= 5 &&
-                                    registroHolistor.Item5 == registroAFIP.Item5)
+                                if (Math.Abs(Math.Abs(registroHolistor.Item2) - Math.Abs(registroAFIP.Item2)) <= 10 &&
+                                    Math.Abs(Math.Abs(registroHolistor.Item3) - Math.Abs(registroAFIP.Item3)) <= 10 &&
+                                    registroHolistor.Item4 == registroAFIP.Item4)
                                 {
-                                    // Coinciden todos los valores, señalizar en verde ambas filas
+                                    // Coinciden todos los valores, señalizar en verde ambas filas y marcar bandera
                                     MarcarFila(workbookHolistor, registroHolistor.Item1, XLColor.FromArgb(255, 204, 255, 204)); // Tono de verde claro
                                     MarcarFila(workbookAFIP, registroAFIP.Item1, XLColor.FromArgb(255, 204, 255, 204)); // Tono de verde claro
+                                    ban = 1;
                                 }
-                                else
-                                {
-                                    // No coinciden todos los valores, señalizar en rojo ambas filas
-                                    MarcarFila(workbookHolistor, registroHolistor.Item1, XLColor.Red);
-                                    MarcarFila(workbookAFIP, registroAFIP.Item1, XLColor.Red);
-                                }
+                            }
+
+                            if (ban == 0)
+                            {
+                                MarcarFila(workbookHolistor, registroHolistor.Item1, XLColor.Red); // Tono de verde claro
                             }
                         }
                     }
@@ -307,28 +302,32 @@ namespace Comparador
                     }
                 }
 
-                // Recorrer el diccionario de AFIP para marcar las filas que no se han marcado
-                foreach (var kvpAFIP in diccionarioAFIP)
-                {
-                    string claveAFIP = kvpAFIP.Key;
-                    var registrosAFIP = kvpAFIP.Value;
-
-                    // Verificar si la clave no se ha marcado en Holistor
-                    if (!diccionarioHolistor.ContainsKey(claveAFIP))
-                    {
-                        // Señalizar en rojo en AFIP
-                        foreach (var registroAFIP in registrosAFIP)
-                        {
-                            MarcarFila(workbookAFIP, registroAFIP.Item1, XLColor.Red);
-                        }
-                    }
-                }
-
                 workbookAFIP.SaveAs(rutaExcelAFIP);
                 workbookHolistor.SaveAs(rutaExcelHolistor);
             }
         }
 
+        static void MarcarNoSeñalizadosEnRojo(string rutaExcelAFIP)
+        {
+            using (var workbookAFIP = new XLWorkbook(rutaExcelAFIP))
+            {
+                var worksheet = workbookAFIP.Worksheets.First(); //
+
+                var defaultColor = XLColor.FromIndex(0); // Color predeterminado de Excel
+
+                foreach (var row in worksheet.RowsUsed())
+                {
+                    var fillColor = row.Style.Fill.BackgroundColor;
+                    if (!fillColor.Equals(XLColor.FromArgb(255, 204, 255, 204)))
+                    {
+                        // Marcar la fila en rojo si el color de fondo es el predeterminado (no señalizado previamente)
+                        row.Style.Fill.BackgroundColor = XLColor.Red;
+                    }
+                }
+
+                workbookAFIP.Save();
+            }
+        }
 
         static void MarcarFila(XLWorkbook workbook, int numeroFila, XLColor color)
         {
