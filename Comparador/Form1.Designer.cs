@@ -43,11 +43,12 @@
             // textBoxAfip
             // 
             textBoxAfip.BackColor = Color.BlueViolet;
+            textBoxAfip.BorderStyle = BorderStyle.FixedSingle;
             textBoxAfip.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             textBoxAfip.ForeColor = SystemColors.ButtonFace;
             textBoxAfip.Location = new Point(29, 23);
             textBoxAfip.Name = "textBoxAfip";
-            textBoxAfip.Size = new Size(154, 23);
+            textBoxAfip.Size = new Size(163, 23);
             textBoxAfip.TabIndex = 0;
             textBoxAfip.Text = "Archivo AFIP";
             textBoxAfip.TextAlign = HorizontalAlignment.Center;
@@ -55,10 +56,12 @@
             // textBoxHolistor
             // 
             textBoxHolistor.BackColor = Color.BlueViolet;
+            textBoxHolistor.BorderStyle = BorderStyle.FixedSingle;
             textBoxHolistor.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             textBoxHolistor.ForeColor = SystemColors.ButtonFace;
             textBoxHolistor.Location = new Point(276, 23);
             textBoxHolistor.Name = "textBoxHolistor";
+            textBoxHolistor.ReadOnly = true;
             textBoxHolistor.Size = new Size(163, 23);
             textBoxHolistor.TabIndex = 1;
             textBoxHolistor.Text = "Archivo Holistor";
@@ -67,6 +70,7 @@
             // buttonAfip
             // 
             buttonAfip.BackColor = Color.BlueViolet;
+            buttonAfip.FlatStyle = FlatStyle.Popup;
             buttonAfip.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             buttonAfip.ForeColor = SystemColors.ButtonFace;
             buttonAfip.Location = new Point(29, 69);
@@ -80,6 +84,7 @@
             // buttonHolistor
             // 
             buttonHolistor.BackColor = Color.BlueViolet;
+            buttonHolistor.FlatStyle = FlatStyle.Popup;
             buttonHolistor.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             buttonHolistor.ForeColor = SystemColors.ButtonFace;
             buttonHolistor.Location = new Point(276, 69);
@@ -93,6 +98,7 @@
             // buttonProcesar
             // 
             buttonProcesar.BackColor = Color.BlueViolet;
+            buttonProcesar.FlatStyle = FlatStyle.Popup;
             buttonProcesar.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             buttonProcesar.ForeColor = SystemColors.ButtonFace;
             buttonProcesar.Location = new Point(491, 23);
@@ -131,7 +137,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Purple;
-            ClientSize = new Size(822, 332);
+            ClientSize = new Size(821, 344);
             Controls.Add(pictureBoxRuedaCargando);
             Controls.Add(pictureBoxLogoEstudio);
             Controls.Add(buttonProcesar);

@@ -95,7 +95,7 @@ namespace Comparador
         }
 
         // Función para procesar correctamente los números de comprobante
-        
+
         static string ProcesarNumeros(string input)
         {
             // Eliminar caracteres que no sean números
@@ -180,7 +180,7 @@ namespace Comparador
                             diccionario[cuit] = new List<(int, double, double, string)>();
                         }
 
-                        diccionario[cuit].Add((fila, iva, total, numeroComprobante)); 
+                        diccionario[cuit].Add((fila, iva, total, numeroComprobante));
                     }
                 }
                 else
@@ -275,8 +275,8 @@ namespace Comparador
                             foreach (var registroAFIP in registrosAFIP)
                             {
                                 // Comparar los valores de neto, iva, total y comprobante
-                                if (Math.Abs(Math.Abs(registroHolistor.Item2) - Math.Abs(registroAFIP.Item2)) <= 10 &&
-                                    Math.Abs(Math.Abs(registroHolistor.Item3) - Math.Abs(registroAFIP.Item3)) <= 10 &&
+                                if ((Math.Abs(Math.Abs(registroHolistor.Item2) - Math.Abs(registroAFIP.Item2)) <= 10 &&
+                                    Math.Abs(Math.Abs(registroHolistor.Item3) - Math.Abs(registroAFIP.Item3)) <= 10) &&
                                     registroHolistor.Item4 == registroAFIP.Item4)
                                 {
                                     // Coinciden todos los valores, señalizar en verde ambas filas y marcar bandera
@@ -288,7 +288,7 @@ namespace Comparador
 
                             if (ban == 0)
                             {
-                                MarcarFila(workbookHolistor, registroHolistor.Item1, XLColor.Red); // Tono de verde claro
+                                MarcarFila(workbookHolistor, registroHolistor.Item1, XLColor.FromArgb(255, 255, 204, 204)); // Tono de verde claro
                             }
                         }
                     }
@@ -297,7 +297,7 @@ namespace Comparador
                         // La clave no existe en el diccionario de AFIP, señalizar en rojo en Holistor
                         foreach (var registroHolistor in registrosHolistor)
                         {
-                            MarcarFila(workbookHolistor, registroHolistor.Item1, XLColor.Red);
+                            MarcarFila(workbookHolistor, registroHolistor.Item1, XLColor.FromArgb(255, 255, 204, 204));
                         }
                     }
                 }
@@ -321,7 +321,7 @@ namespace Comparador
                     if (!fillColor.Equals(XLColor.FromArgb(255, 204, 255, 204)))
                     {
                         // Marcar la fila en rojo si el color de fondo es el predeterminado (no señalizado previamente)
-                        row.Style.Fill.BackgroundColor = XLColor.Red;
+                        row.Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
                     }
                 }
 
