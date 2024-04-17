@@ -95,7 +95,6 @@ namespace Comparador
         }
 
         // Función para procesar correctamente los números de comprobante
-
         static string ProcesarNumeros(string input)
         {
             // Eliminar caracteres que no sean números
@@ -136,7 +135,7 @@ namespace Comparador
             return Regex.Replace(cuit, @"[^\d]", "");
         }
 
-        // Función para armar el diccionario de Holistor --> {CUIT}: (fila, neto, iva, total, comprobante)
+        // Función para armar el diccionario de Holistor --> {CUIT}: (fila, iva, total, comprobante)
         static Dictionary<string, List<(int, double, double, string)>> ArmarDiccionarioHolistor(string rutaExcel)
         {
             var diccionario = new Dictionary<string, List<(int, double, double, string)>>();
@@ -192,7 +191,7 @@ namespace Comparador
             return diccionario;
         }
 
-        // Función para armar el diccionario de AFIP --> {CUIT}: (fila, neto, iva, total, comprobante)
+        // Función para armar el diccionario de AFIP --> {CUIT}: (fila, iva, total, comprobante)
         static Dictionary<string, List<(int, double, double, string)>> ArmarDiccionarioAFIP(string rutaExcel)
         {
             var diccionario = new Dictionary<string, List<(int, double, double, string)>>();
@@ -274,7 +273,8 @@ namespace Comparador
 
                             foreach (var registroAFIP in registrosAFIP)
                             {
-                                // Comparar los valores de neto, iva, total y comprobante
+
+                                // Comparar los valores de neto, iva, total, comprobante y CUIT
                                 if ((Math.Abs(Math.Abs(registroHolistor.Item2) - Math.Abs(registroAFIP.Item2)) <= 10 &&
                                     Math.Abs(Math.Abs(registroHolistor.Item3) - Math.Abs(registroAFIP.Item3)) <= 10) &&
                                     registroHolistor.Item4 == registroAFIP.Item4)
@@ -311,7 +311,7 @@ namespace Comparador
         {
             using (var workbookAFIP = new XLWorkbook(rutaExcelAFIP))
             {
-                var worksheet = workbookAFIP.Worksheets.First(); //
+                var worksheet = workbookAFIP.Worksheets.First(); 
 
                 var defaultColor = XLColor.FromIndex(0); // Color predeterminado de Excel
 
