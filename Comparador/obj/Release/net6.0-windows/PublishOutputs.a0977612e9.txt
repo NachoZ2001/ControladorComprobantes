@@ -1,0 +1,12 @@
+C:\Users\w1zar\OneDrive\Escritorio\TRABAJO\Controlador\Comparador.exe
+C:\Users\w1zar\OneDrive\Escritorio\TRABAJO\Controlador\Comparador.dll
+C:\Users\w1zar\OneDrive\Escritorio\TRABAJO\Controlador\Comparador.deps.json
+C:\Users\w1zar\OneDrive\Escritorio\TRABAJO\Controlador\Comparador.runtimeconfig.json
+C:\Users\w1zar\OneDrive\Escritorio\TRABAJO\Controlador\Comparador.pdb
+C:\Users\w1zar\OneDrive\Escritorio\TRABAJO\Controlador\ClosedXML.dll
+C:\Users\w1zar\OneDrive\Escritorio\TRABAJO\Controlador\DocumentFormat.OpenXml.dll
+C:\Users\w1zar\OneDrive\Escritorio\TRABAJO\Controlador\ExcelNumberFormat.dll
+C:\Users\w1zar\OneDrive\Escritorio\TRABAJO\Controlador\Irony.dll
+C:\Users\w1zar\OneDrive\Escritorio\TRABAJO\Controlador\Newtonsoft.Json.dll
+C:\Users\w1zar\OneDrive\Escritorio\TRABAJO\Controlador\SixLabors.Fonts.dll
+C:\Users\w1zar\OneDrive\Escritorio\TRABAJO\Controlador\XLParser.dll

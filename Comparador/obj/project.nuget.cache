@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "F3lOwqbBzxqkxKgyOtaJLwOzeDjjZIPf2SSp8JOK0AMcXZPxrmAc9NZCwYEJPKg/Ul1Xd1meDqtb4AVajYdadA==",
+  "dgSpecHash": "tFyJy2zUfTiM6pK9lXMVSn6QMjYkN7e0Ok7drLfXmP7X/j1KbIxOBcStLeLeOocIi0wr0THJKiIQjBGZIM79gg==",
   "success": true,
   "projectFilePath": "C:\\Program Files\\Sublime Merge\\ComparadorEli\\Comparador\\Comparador.csproj",
   "expectedPackageFiles": [
@@ -12,6 +12,7 @@
     "C:\\Users\\w1zar\\.nuget\\packages\\microsoft.netcore.targets\\1.1.3\\microsoft.netcore.targets.1.1.3.nupkg.sha512",
     "C:\\Users\\w1zar\\.nuget\\packages\\microsoft.win32.primitives\\4.3.0\\microsoft.win32.primitives.4.3.0.nupkg.sha512",
     "C:\\Users\\w1zar\\.nuget\\packages\\netstandard.library\\1.6.1\\netstandard.library.1.6.1.nupkg.sha512",
+    "C:\\Users\\w1zar\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
     "C:\\Users\\w1zar\\.nuget\\packages\\runtime.debian.8-x64.runtime.native.system.security.cryptography.openssl\\4.3.2\\runtime.debian.8-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512",
     "C:\\Users\\w1zar\\.nuget\\packages\\runtime.fedora.23-x64.runtime.native.system.security.cryptography.openssl\\4.3.2\\runtime.fedora.23-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512",
     "C:\\Users\\w1zar\\.nuget\\packages\\runtime.fedora.24-x64.runtime.native.system.security.cryptography.openssl\\4.3.2\\runtime.fedora.24-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512",

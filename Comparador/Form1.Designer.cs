@@ -36,8 +36,14 @@
             buttonProcesar = new Button();
             pictureBoxLogoEstudio = new PictureBox();
             pictureBoxRuedaCargando = new PictureBox();
+            buttonDefinirColumnas = new Button();
+            textBoxTolerancia = new TextBox();
+            numericUpDownTolerancia = new NumericUpDown();
+            comboBoxEsquemas = new ComboBox();
+            textBox1 = new TextBox();
             ((System.ComponentModel.ISupportInitialize)pictureBoxLogoEstudio).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxRuedaCargando).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownTolerancia).BeginInit();
             SuspendLayout();
             // 
             // textBoxAfip
@@ -48,6 +54,7 @@
             textBoxAfip.ForeColor = SystemColors.ButtonFace;
             textBoxAfip.Location = new Point(29, 23);
             textBoxAfip.Name = "textBoxAfip";
+            textBoxAfip.ReadOnly = true;
             textBoxAfip.Size = new Size(163, 23);
             textBoxAfip.TabIndex = 0;
             textBoxAfip.Text = "Archivo AFIP";
@@ -64,7 +71,7 @@
             textBoxHolistor.ReadOnly = true;
             textBoxHolistor.Size = new Size(163, 23);
             textBoxHolistor.TabIndex = 1;
-            textBoxHolistor.Text = "Archivo Holistor";
+            textBoxHolistor.Text = "Archivo Contabilidad";
             textBoxHolistor.TextAlign = HorizontalAlignment.Center;
             // 
             // buttonAfip
@@ -89,9 +96,9 @@
             buttonHolistor.ForeColor = SystemColors.ButtonFace;
             buttonHolistor.Location = new Point(276, 69);
             buttonHolistor.Name = "buttonHolistor";
-            buttonHolistor.Size = new Size(183, 23);
+            buttonHolistor.Size = new Size(209, 23);
             buttonHolistor.TabIndex = 3;
-            buttonHolistor.Text = "Seleccionar archivo Holistor";
+            buttonHolistor.Text = "Seleccionar archivo Contabilidad";
             buttonHolistor.UseVisualStyleBackColor = false;
             buttonHolistor.Click += buttonHolistor_Click;
             // 
@@ -101,7 +108,7 @@
             buttonProcesar.FlatStyle = FlatStyle.Popup;
             buttonProcesar.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             buttonProcesar.ForeColor = SystemColors.ButtonFace;
-            buttonProcesar.Location = new Point(491, 23);
+            buttonProcesar.Location = new Point(531, 23);
             buttonProcesar.Name = "buttonProcesar";
             buttonProcesar.Size = new Size(155, 69);
             buttonProcesar.TabIndex = 4;
@@ -114,7 +121,7 @@
             pictureBoxLogoEstudio.BackColor = Color.Purple;
             pictureBoxLogoEstudio.BackgroundImageLayout = ImageLayout.None;
             pictureBoxLogoEstudio.Image = (Image)resources.GetObject("pictureBoxLogoEstudio.Image");
-            pictureBoxLogoEstudio.Location = new Point(29, 117);
+            pictureBoxLogoEstudio.Location = new Point(29, 268);
             pictureBoxLogoEstudio.Name = "pictureBoxLogoEstudio";
             pictureBoxLogoEstudio.Size = new Size(776, 213);
             pictureBoxLogoEstudio.SizeMode = PictureBoxSizeMode.StretchImage;
@@ -125,19 +132,90 @@
             // 
             pictureBoxRuedaCargando.BackColor = Color.Purple;
             pictureBoxRuedaCargando.Image = (Image)resources.GetObject("pictureBoxRuedaCargando.Image");
-            pictureBoxRuedaCargando.Location = new Point(689, 23);
+            pictureBoxRuedaCargando.Location = new Point(712, 23);
             pictureBoxRuedaCargando.Name = "pictureBoxRuedaCargando";
             pictureBoxRuedaCargando.Size = new Size(93, 69);
             pictureBoxRuedaCargando.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBoxRuedaCargando.TabIndex = 8;
             pictureBoxRuedaCargando.TabStop = false;
             // 
+            // buttonDefinirColumnas
+            // 
+            buttonDefinirColumnas.BackColor = Color.BlueViolet;
+            buttonDefinirColumnas.FlatStyle = FlatStyle.Popup;
+            buttonDefinirColumnas.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonDefinirColumnas.ForeColor = SystemColors.ButtonFace;
+            buttonDefinirColumnas.Location = new Point(276, 111);
+            buttonDefinirColumnas.Name = "buttonDefinirColumnas";
+            buttonDefinirColumnas.Size = new Size(209, 23);
+            buttonDefinirColumnas.TabIndex = 9;
+            buttonDefinirColumnas.Text = "Crear esquema";
+            buttonDefinirColumnas.UseVisualStyleBackColor = false;
+            buttonDefinirColumnas.Click += buttonDefinirColumnas_Click;
+            // 
+            // textBoxTolerancia
+            // 
+            textBoxTolerancia.BackColor = Color.BlueViolet;
+            textBoxTolerancia.BorderStyle = BorderStyle.FixedSingle;
+            textBoxTolerancia.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            textBoxTolerancia.ForeColor = SystemColors.ButtonFace;
+            textBoxTolerancia.Location = new Point(276, 220);
+            textBoxTolerancia.Name = "textBoxTolerancia";
+            textBoxTolerancia.ReadOnly = true;
+            textBoxTolerancia.Size = new Size(209, 23);
+            textBoxTolerancia.TabIndex = 11;
+            textBoxTolerancia.Text = "Tolerancia";
+            textBoxTolerancia.TextAlign = HorizontalAlignment.Center;
+            // 
+            // numericUpDownTolerancia
+            // 
+            numericUpDownTolerancia.BackColor = Color.BlueViolet;
+            numericUpDownTolerancia.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            numericUpDownTolerancia.ForeColor = SystemColors.ButtonFace;
+            numericUpDownTolerancia.Location = new Point(531, 220);
+            numericUpDownTolerancia.Name = "numericUpDownTolerancia";
+            numericUpDownTolerancia.Size = new Size(120, 23);
+            numericUpDownTolerancia.TabIndex = 12;
+            numericUpDownTolerancia.TextAlign = HorizontalAlignment.Center;
+            numericUpDownTolerancia.UpDownAlign = LeftRightAlignment.Left;
+            // 
+            // comboBoxEsquemas
+            // 
+            comboBoxEsquemas.BackColor = Color.BlueViolet;
+            comboBoxEsquemas.FlatStyle = FlatStyle.Popup;
+            comboBoxEsquemas.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            comboBoxEsquemas.ForeColor = SystemColors.ButtonFace;
+            comboBoxEsquemas.FormattingEnabled = true;
+            comboBoxEsquemas.Location = new Point(276, 173);
+            comboBoxEsquemas.Name = "comboBoxEsquemas";
+            comboBoxEsquemas.RightToLeft = RightToLeft.No;
+            comboBoxEsquemas.Size = new Size(209, 23);
+            comboBoxEsquemas.TabIndex = 13;
+            comboBoxEsquemas.UseWaitCursor = true;
+            // 
+            // textBox1
+            // 
+            textBox1.BackColor = Color.Purple;
+            textBox1.BorderStyle = BorderStyle.None;
+            textBox1.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
+            textBox1.ForeColor = SystemColors.ButtonFace;
+            textBox1.Location = new Point(293, 147);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(192, 20);
+            textBox1.TabIndex = 14;
+            textBox1.Text = "Seleccionar un esquema";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Purple;
-            ClientSize = new Size(821, 344);
+            ClientSize = new Size(832, 493);
+            Controls.Add(textBox1);
+            Controls.Add(comboBoxEsquemas);
+            Controls.Add(numericUpDownTolerancia);
+            Controls.Add(textBoxTolerancia);
+            Controls.Add(buttonDefinirColumnas);
             Controls.Add(pictureBoxRuedaCargando);
             Controls.Add(pictureBoxLogoEstudio);
             Controls.Add(buttonProcesar);
@@ -150,6 +228,7 @@
             Load += Form1_Load;
             ((System.ComponentModel.ISupportInitialize)pictureBoxLogoEstudio).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxRuedaCargando).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownTolerancia).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -163,5 +242,10 @@
         private Button buttonProcesar;
         private PictureBox pictureBoxLogoEstudio;
         private PictureBox pictureBoxRuedaCargando;
+        private Button buttonDefinirColumnas;
+        private TextBox textBoxTolerancia;
+        private NumericUpDown numericUpDownTolerancia;
+        private ComboBox comboBoxEsquemas;
+        private TextBox textBox1;
     }
 }

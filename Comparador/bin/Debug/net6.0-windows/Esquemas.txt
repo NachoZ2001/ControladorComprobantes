@@ -1,0 +1,2 @@
+{"Nombre":"Holistor","IndiceColumnaCuit":0,"IndiceColumnaPuntoVenta":0,"IndiceColumnaComprobante":0,"IndiceColumnaIVA":0,"IndiceColumnaTotal":0}
+{"Nombre":"Cooperativa","IndiceColumnaCuit":8,"IndiceColumnaPuntoVenta":4,"IndiceColumnaComprobante":5,"IndiceColumnaIVA":10,"IndiceColumnaTotal":12}
