@@ -137,6 +137,11 @@ namespace Comparador
             // Cargar los esquemas desde el archivo
             CargarEsquemasDesdeArchivo(filePath, listaEsquemas);
 
+            if (columnas != null)
+            {
+                this.columnas.Clear();
+            }
+
             if (comboBoxEsquemas.SelectedItem != null)
             {
                 foreach (Esquema esquema in listaEsquemas)

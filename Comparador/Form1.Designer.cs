@@ -55,7 +55,7 @@
             textBoxAfip.Location = new Point(29, 23);
             textBoxAfip.Name = "textBoxAfip";
             textBoxAfip.ReadOnly = true;
-            textBoxAfip.Size = new Size(163, 23);
+            textBoxAfip.Size = new Size(183, 23);
             textBoxAfip.TabIndex = 0;
             textBoxAfip.Text = "Archivo AFIP";
             textBoxAfip.TextAlign = HorizontalAlignment.Center;
@@ -69,7 +69,7 @@
             textBoxHolistor.Location = new Point(276, 23);
             textBoxHolistor.Name = "textBoxHolistor";
             textBoxHolistor.ReadOnly = true;
-            textBoxHolistor.Size = new Size(163, 23);
+            textBoxHolistor.Size = new Size(209, 23);
             textBoxHolistor.TabIndex = 1;
             textBoxHolistor.Text = "Archivo Contabilidad";
             textBoxHolistor.TextAlign = HorizontalAlignment.Center;
@@ -182,6 +182,7 @@
             // comboBoxEsquemas
             // 
             comboBoxEsquemas.BackColor = Color.BlueViolet;
+            comboBoxEsquemas.Cursor = Cursors.Hand;
             comboBoxEsquemas.FlatStyle = FlatStyle.Popup;
             comboBoxEsquemas.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             comboBoxEsquemas.ForeColor = SystemColors.ButtonFace;
