@@ -126,6 +126,7 @@
             numericUpDownPuntoVenta.TabIndex = 5;
             numericUpDownPuntoVenta.TextAlign = HorizontalAlignment.Center;
             numericUpDownPuntoVenta.Value = new decimal(new int[] { 1, 0, 0, int.MinValue });
+            numericUpDownPuntoVenta.ValueChanged += numericUpDownPuntoVenta_ValueChanged;
             // 
             // textBoxNumeroComprobante
             // 

@@ -14,6 +14,8 @@ namespace Comparador
     {
         public List<int> ColumnasSeleccionadas { get; private set; }
 
+        public string NombreEsquema { get; set; }
+
         public FormColumnas()
         {
             InitializeComponent();
@@ -21,15 +23,17 @@ namespace Comparador
 
         private void buttonGuardar_Click(object sender, EventArgs e)
         {
-            // Mostrar el cuadro de diálogo de entrada
-            InputDialog inputDialog = new InputDialog();
-            if (inputDialog.ShowDialog() == DialogResult.OK)
+            if (this.NombreEsquema == null)
             {
-                string nombreEsquema = inputDialog.EnteredText;
-
-                if (!string.IsNullOrEmpty(nombreEsquema))
+                // Mostrar el cuadro de diálogo de entrada
+                InputDialog inputDialog = new InputDialog();
+                if (inputDialog.ShowDialog() == DialogResult.OK)
                 {
-                    ColumnasSeleccionadas = new List<int>()
+                    string nombreEsquema = inputDialog.EnteredText;
+
+                    if (!string.IsNullOrEmpty(nombreEsquema))
+                    {
+                        ColumnasSeleccionadas = new List<int>()
                     {
                         (int)numericUpDownCuit.Value,
                         (int)numericUpDownPuntoVenta.Value,
@@ -38,49 +42,143 @@ namespace Comparador
                         (int)numericUpDownTotal.Value
                     };
 
-                    // Crear un nuevo objeto Esquema con el nombre y las columnas seleccionadas
-                    EsquemaColumnas esquema = new EsquemaColumnas(nombreEsquema, (int)numericUpDownCuit.Value, (int)numericUpDownPuntoVenta.Value,
-                        (int)numericUpDownNumeroComprobante.Value, (int)numericUpDownIVA.Value, (int)numericUpDownTotal.Value);
+                        // Crear un nuevo objeto Esquema con el nombre y las columnas seleccionadas
+                        EsquemaColumnas esquema = new EsquemaColumnas(nombreEsquema, (int)numericUpDownCuit.Value, (int)numericUpDownPuntoVenta.Value,
+                            (int)numericUpDownNumeroComprobante.Value, (int)numericUpDownIVA.Value, (int)numericUpDownTotal.Value);
 
-                    // Resto del proceso para guardar el esquema...
-                    string filePath = Path.Combine(Application.StartupPath, "Esquemas.txt");
+                        // Ruta del archivo Esquemas en el directorio de la aplicación
+                        string filePath = Path.Combine(Application.StartupPath, "Esquemas.txt");
 
-                    try
-                    {
-                        // Serializar el objeto Esquema a una cadena de texto en formato JSON
-                        string esquemaJson = Newtonsoft.Json.JsonConvert.SerializeObject(esquema);
-
-                        // Escribir la cadena de texto en el archivo
-                        using (StreamWriter writer = new StreamWriter(filePath, true))
+                        try
                         {
-                            // Escribir una nueva línea antes de agregar el nuevo esquema, si el archivo ya contiene datos
-                            if (writer.BaseStream.Length > 0)
-                                writer.WriteLine();
+                            // Leer los esquemas existentes
+                            List<EsquemaColumnas> esquemasExistentes = LeerEsquemasDesdeArchivo(filePath);
 
-                            writer.Write(esquemaJson);
+                            // Verificar si ya existe un esquema con el mismo nombre
+                            var esquemaExistente = esquemasExistentes.Find(e => e.Nombre == nombreEsquema);
+                            if (esquemaExistente != null)
+                            {
+                                // Preguntar al usuario si desea sobrescribir el esquema existente
+                                DialogResult result = MessageBox.Show($"Ya existe un esquema con el nombre '{nombreEsquema}'. ¿Desea reemplazarlo?",
+                                    "Confirmar sobrescritura", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                                if (result == DialogResult.No)
+                                {
+                                    MessageBox.Show("El esquema no ha sido guardado.");
+                                    return;
+                                }
+                                else
+                                {
+                                    // Eliminar el esquema existente de la lista
+                                    esquemasExistentes.Remove(esquemaExistente);
+                                }
+                            }
+
+                            // Agregar el nuevo esquema a la lista
+                            esquemasExistentes.Add(esquema);
+
+                            // Serializar la lista de esquemas a una cadena de texto en formato JSON
+                            List<string> esquemasJson = new List<string>();
+                            foreach (var esq in esquemasExistentes)
+                            {
+                                esquemasJson.Add(Newtonsoft.Json.JsonConvert.SerializeObject(esq));
+                            }
+
+                            // Escribir la cadena de texto en el archivo
+                            File.WriteAllLines(filePath, esquemasJson);
+
+                            MessageBox.Show("Esquema guardado en el archivo Esquemas.txt");
                         }
-
-                        MessageBox.Show("Esquema guardado en el archivo Esquemas.txt");
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Error al guardar el esquema: " + ex.Message);
+                        }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        MessageBox.Show("Error al guardar el esquema: " + ex.Message);
+                        MessageBox.Show("Por favor, ingrese un nombre para el esquema.");
                     }
                 }
-                else
+
+                this.Close();
+            }
+            else
+            {
+                // Ruta del archivo Esquemas en el directorio de la aplicación
+                string filePath = Path.Combine(Application.StartupPath, "Esquemas.txt");
+
+                List<EsquemaColumnas> esquemasExistentes = LeerEsquemasDesdeArchivo(filePath);
+
+                // Verificar si ya existe un esquema con el mismo nombre
+                var esquemaExistente = esquemasExistentes.Find(e => e.Nombre == NombreEsquema);
+                if (esquemaExistente != null)
                 {
-                    MessageBox.Show("Por favor, ingrese un nombre para el esquema.");
+                    // Crear un nuevo objeto Esquema con el nombre y las columnas seleccionadas
+                    EsquemaColumnas esquema = new EsquemaColumnas(NombreEsquema, (int)numericUpDownCuit.Value, (int)numericUpDownPuntoVenta.Value,
+                        (int)numericUpDownNumeroComprobante.Value, (int)numericUpDownIVA.Value, (int)numericUpDownTotal.Value);
+
+                    // Eliminar el esquema existente de la lista
+                    esquemasExistentes.Remove(esquemaExistente);
+
+                    // Agregar el nuevo esquema a la lista
+                    esquemasExistentes.Add(esquema);
+
+                    // Serializar la lista de esquemas a una cadena de texto en formato JSON
+                    List<string> esquemasJson = new List<string>();
+                    foreach (var esq in esquemasExistentes)
+                    {
+                        esquemasJson.Add(Newtonsoft.Json.JsonConvert.SerializeObject(esq));
+                    }
+
+                    // Escribir la cadena de texto en el archivo
+                    File.WriteAllLines(filePath, esquemasJson);
+
+                    MessageBox.Show("Esquema modificado correctamente");
+                }
+
+                this.Close();
+            }
+        }
+
+        List<EsquemaColumnas> LeerEsquemasDesdeArchivo(string filePath)
+        {
+            List<EsquemaColumnas> esquemas = new List<EsquemaColumnas>();
+
+            if (File.Exists(filePath))
+            {
+                var lines = File.ReadAllLines(filePath);
+                foreach (var line in lines)
+                {
+                    var esquema = Newtonsoft.Json.JsonConvert.DeserializeObject<EsquemaColumnas>(line);
+                    esquemas.Add(esquema);
                 }
             }
 
-            this.Close();
+            return esquemas;
         }
+
+
         private void buttonCancelar_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
+        public void cargarDatos(int IndiceColumnaCuit, int IndiceColumnaIVA, int IndiceColumnaTotal, int IndiceColumnaPuntoVenta, int IndiceColumnaComprobante, string nombre)
+        {
+            numericUpDownCuit.Value = IndiceColumnaCuit;
+            numericUpDownIVA.Value = IndiceColumnaIVA;
+            numericUpDownTotal.Value = IndiceColumnaTotal;
+            numericUpDownPuntoVenta.Value = IndiceColumnaPuntoVenta;
+            numericUpDownNumeroComprobante.Value = IndiceColumnaComprobante;
+            this.NombreEsquema = nombre;
+        }
+
         private void FormColumnas_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void numericUpDownPuntoVenta_ValueChanged(object sender, EventArgs e)
         {
 
         }

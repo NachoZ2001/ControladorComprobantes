@@ -41,6 +41,7 @@
             numericUpDownTolerancia = new NumericUpDown();
             comboBoxEsquemas = new ComboBox();
             textBox1 = new TextBox();
+            buttonEditarEsquema = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBoxLogoEstudio).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBoxRuedaCargando).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownTolerancia).BeginInit();
@@ -108,7 +109,7 @@
             buttonProcesar.FlatStyle = FlatStyle.Popup;
             buttonProcesar.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             buttonProcesar.ForeColor = SystemColors.ButtonFace;
-            buttonProcesar.Location = new Point(531, 23);
+            buttonProcesar.Location = new Point(522, 23);
             buttonProcesar.Name = "buttonProcesar";
             buttonProcesar.Size = new Size(155, 69);
             buttonProcesar.TabIndex = 4;
@@ -121,9 +122,9 @@
             pictureBoxLogoEstudio.BackColor = Color.Purple;
             pictureBoxLogoEstudio.BackgroundImageLayout = ImageLayout.None;
             pictureBoxLogoEstudio.Image = (Image)resources.GetObject("pictureBoxLogoEstudio.Image");
-            pictureBoxLogoEstudio.Location = new Point(29, 268);
+            pictureBoxLogoEstudio.Location = new Point(86, 274);
             pictureBoxLogoEstudio.Name = "pictureBoxLogoEstudio";
-            pictureBoxLogoEstudio.Size = new Size(776, 213);
+            pictureBoxLogoEstudio.Size = new Size(671, 179);
             pictureBoxLogoEstudio.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBoxLogoEstudio.TabIndex = 7;
             pictureBoxLogoEstudio.TabStop = false;
@@ -132,7 +133,7 @@
             // 
             pictureBoxRuedaCargando.BackColor = Color.Purple;
             pictureBoxRuedaCargando.Image = (Image)resources.GetObject("pictureBoxRuedaCargando.Image");
-            pictureBoxRuedaCargando.Location = new Point(712, 23);
+            pictureBoxRuedaCargando.Location = new Point(721, 23);
             pictureBoxRuedaCargando.Name = "pictureBoxRuedaCargando";
             pictureBoxRuedaCargando.Size = new Size(93, 69);
             pictureBoxRuedaCargando.SizeMode = PictureBoxSizeMode.StretchImage;
@@ -145,7 +146,7 @@
             buttonDefinirColumnas.FlatStyle = FlatStyle.Popup;
             buttonDefinirColumnas.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             buttonDefinirColumnas.ForeColor = SystemColors.ButtonFace;
-            buttonDefinirColumnas.Location = new Point(276, 111);
+            buttonDefinirColumnas.Location = new Point(29, 157);
             buttonDefinirColumnas.Name = "buttonDefinirColumnas";
             buttonDefinirColumnas.Size = new Size(209, 23);
             buttonDefinirColumnas.TabIndex = 9;
@@ -159,7 +160,7 @@
             textBoxTolerancia.BorderStyle = BorderStyle.FixedSingle;
             textBoxTolerancia.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             textBoxTolerancia.ForeColor = SystemColors.ButtonFace;
-            textBoxTolerancia.Location = new Point(276, 220);
+            textBoxTolerancia.Location = new Point(29, 220);
             textBoxTolerancia.Name = "textBoxTolerancia";
             textBoxTolerancia.ReadOnly = true;
             textBoxTolerancia.Size = new Size(209, 23);
@@ -172,7 +173,7 @@
             numericUpDownTolerancia.BackColor = Color.BlueViolet;
             numericUpDownTolerancia.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             numericUpDownTolerancia.ForeColor = SystemColors.ButtonFace;
-            numericUpDownTolerancia.Location = new Point(531, 220);
+            numericUpDownTolerancia.Location = new Point(276, 220);
             numericUpDownTolerancia.Name = "numericUpDownTolerancia";
             numericUpDownTolerancia.Size = new Size(120, 23);
             numericUpDownTolerancia.TabIndex = 12;
@@ -187,7 +188,7 @@
             comboBoxEsquemas.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             comboBoxEsquemas.ForeColor = SystemColors.ButtonFace;
             comboBoxEsquemas.FormattingEnabled = true;
-            comboBoxEsquemas.Location = new Point(276, 173);
+            comboBoxEsquemas.Location = new Point(276, 157);
             comboBoxEsquemas.Name = "comboBoxEsquemas";
             comboBoxEsquemas.RightToLeft = RightToLeft.No;
             comboBoxEsquemas.Size = new Size(209, 23);
@@ -200,18 +201,33 @@
             textBox1.BorderStyle = BorderStyle.None;
             textBox1.Font = new Font("Segoe UI", 11.25F, FontStyle.Bold, GraphicsUnit.Point);
             textBox1.ForeColor = SystemColors.ButtonFace;
-            textBox1.Location = new Point(293, 147);
+            textBox1.Location = new Point(293, 119);
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(192, 20);
             textBox1.TabIndex = 14;
             textBox1.Text = "Seleccionar un esquema";
+            // 
+            // buttonEditarEsquema
+            // 
+            buttonEditarEsquema.BackColor = Color.BlueViolet;
+            buttonEditarEsquema.FlatStyle = FlatStyle.Popup;
+            buttonEditarEsquema.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            buttonEditarEsquema.ForeColor = SystemColors.ButtonFace;
+            buttonEditarEsquema.Location = new Point(522, 157);
+            buttonEditarEsquema.Name = "buttonEditarEsquema";
+            buttonEditarEsquema.Size = new Size(120, 23);
+            buttonEditarEsquema.TabIndex = 15;
+            buttonEditarEsquema.Text = "Editar esquema";
+            buttonEditarEsquema.UseVisualStyleBackColor = false;
+            buttonEditarEsquema.Click += buttonEditarEsquema_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Purple;
-            ClientSize = new Size(832, 493);
+            ClientSize = new Size(850, 465);
+            Controls.Add(buttonEditarEsquema);
             Controls.Add(textBox1);
             Controls.Add(comboBoxEsquemas);
             Controls.Add(numericUpDownTolerancia);
@@ -248,5 +264,6 @@
         private NumericUpDown numericUpDownTolerancia;
         private ComboBox comboBoxEsquemas;
         private TextBox textBox1;
+        private Button buttonEditarEsquema;
     }
 }

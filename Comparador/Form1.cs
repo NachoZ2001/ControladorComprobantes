@@ -27,7 +27,7 @@ namespace Comparador
             // Establecer el tamaño mínimo y máximo para evitar el cambio de tamaño
             this.MinimumSize = this.MaximumSize = this.Size;
 
-            comboBoxEsquemas.Text = "Seleccionar un esquema";
+            buttonEditarEsquema.Visible = false;
 
             InicializarYMostrarEsquemas();
         }
@@ -57,6 +57,8 @@ namespace Comparador
             {
                 comboBoxEsquemas.SelectedIndex = 0;
             }
+
+            buttonEditarEsquema.Visible = true;
         }
 
         private void CargarEsquemasDesdeArchivo(string filePath, List<Esquema> listaEsquemas)
@@ -126,6 +128,22 @@ namespace Comparador
 
         private async void buttonProcesar_Click(object sender, EventArgs e)
         {
+            if (textBoxAfip.Text == "Archivo AFIP")
+            {
+                MessageBox.Show("Falta la ruta del archivo AFIP", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (textBoxHolistor.Text == "Archivo Contabilidad")
+            {
+                MessageBox.Show("Falta la ruta del archivo HOLISTOR", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (comboBoxEsquemas.Text == null)
+            {
+                MessageBox.Show("Falta seleccionar un esquema", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             pictureBoxRuedaCargando.Visible = true;
 
             // Define una lista de esquemas
@@ -867,6 +885,32 @@ namespace Comparador
         {
             // Abrir el formulario para definir columnas
             FormColumnas columnasForm = new FormColumnas();
+            columnasForm.ShowDialog();
+
+            InicializarYMostrarEsquemas();
+        }
+
+        private void buttonEditarEsquema_Click(object sender, EventArgs e)
+        {
+            // Define una lista de esquemas
+            List<Esquema> listaEsquemas = new List<Esquema>();
+
+            // Ruta del archivo Esquemas en el directorio de la aplicación
+            string filePath = Path.Combine(Application.StartupPath, "Esquemas.txt");
+
+            // Cargar los esquemas desde el archivo
+            CargarEsquemasDesdeArchivo(filePath, listaEsquemas);
+
+            FormColumnas columnasForm = new FormColumnas();
+
+            foreach (Esquema esquema in listaEsquemas)
+            {
+                if (comboBoxEsquemas.SelectedItem.ToString() == esquema.Nombre)
+                {
+                    columnasForm.cargarDatos(esquema.IndiceCuit, esquema.IndiceIVA, esquema.IndiceTotal, esquema.IndicePuntoVenta, esquema.IndiceNumeroComprobante, esquema.Nombre);
+                }
+            }
+
             columnasForm.ShowDialog();
 
             InicializarYMostrarEsquemas();
