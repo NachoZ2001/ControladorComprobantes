@@ -199,7 +199,7 @@ namespace Comparador
             int indiceColumnaNumeroComprobante = columnas[2];
             int indiceColumnaIVA = columnas[3];
             int indiceColumnaTotal = columnas[4];
-            int indiceColumnaFecha = columnas[5];
+            int indiceColumnaFecha = 1;
 
             //Armar diccionarios
             var diccionarioContabilidad = ArmarDiccionarioContabilidad(rutaExcelContabilidad, indiceColumnaCUIT, indiceColumnaPuntoVenta, indiceColumnaNumeroComprobante, indiceColumnaTotal, indiceColumnaIVA, indiceColumnaFecha);
