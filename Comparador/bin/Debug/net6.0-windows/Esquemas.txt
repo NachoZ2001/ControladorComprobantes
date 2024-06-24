@@ -1,3 +1,2 @@
-{"Nombre":"Cooperativa","IndiceColumnaCuit":8,"IndiceColumnaPuntoVenta":4,"IndiceColumnaComprobante":5,"IndiceColumnaIVA":10,"IndiceColumnaTotal":12}
-{"Nombre":"Esquema de prueba","IndiceColumnaCuit":-1,"IndiceColumnaPuntoVenta":-1,"IndiceColumnaComprobante":-1,"IndiceColumnaIVA":-1,"IndiceColumnaTotal":-1}
-{"Nombre":"Holistor","IndiceColumnaCuit":0,"IndiceColumnaPuntoVenta":0,"IndiceColumnaComprobante":0,"IndiceColumnaIVA":0,"IndiceColumnaTotal":0}
+{"Nombre":"Cooperativa","IndiceColumnaCuit":8,"IndiceColumnaPuntoVenta":4,"IndiceColumnaComprobante":5,"IndiceColumnaIVA":10,"IndiceColumnaTotal":12,"IndiceColumnaFecha":1}
+{"Nombre":"Holistor","IndiceColumnaCuit":0,"IndiceColumnaPuntoVenta":0,"IndiceColumnaComprobante":0,"IndiceColumnaIVA":0,"IndiceColumnaTotal":0,"IndiceColumnaFecha":0}

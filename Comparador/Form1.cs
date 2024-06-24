@@ -171,6 +171,7 @@ namespace Comparador
                         this.columnas.Add(esquema.IndiceNumeroComprobante);
                         this.columnas.Add(esquema.IndiceIVA);
                         this.columnas.Add(esquema.IndiceTotal);
+                        this.columnas.Add(esquema.IndiceFecha);
                     }
                 }
             }
@@ -199,7 +200,7 @@ namespace Comparador
             int indiceColumnaNumeroComprobante = columnas[2];
             int indiceColumnaIVA = columnas[3];
             int indiceColumnaTotal = columnas[4];
-            int indiceColumnaFecha = 1;
+            int indiceColumnaFecha = columnas[5];
 
             //Armar diccionarios
             var diccionarioContabilidad = ArmarDiccionarioContabilidad(rutaExcelContabilidad, indiceColumnaCUIT, indiceColumnaPuntoVenta, indiceColumnaNumeroComprobante, indiceColumnaTotal, indiceColumnaIVA, indiceColumnaFecha);
@@ -674,6 +675,524 @@ namespace Comparador
             }
         }
 
+        static void CompararFechaImporteComprobanteHolistor(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelHolistor, string rutaExcelAFIP, double tolerancia)
+        {
+            using (var workbookHolistor = new XLWorkbook(rutaExcelHolistor))
+            using (var workbookAFIP = new XLWorkbook(rutaExcelAFIP))
+            {
+                var worksheetArchivoHolistor = workbookHolistor.Worksheets.First();
+                var worksheetArchivoAFIP = workbookAFIP.Worksheets.First();
+
+                int ultimaColumnaHolistor = worksheetArchivoHolistor.LastColumnUsed().ColumnNumber();
+                int ultimaColumnaAFIP = worksheetArchivoAFIP.LastColumnUsed().ColumnNumber();
+
+                int indiceColumnaPuntoVentaAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Punto de Venta");
+                int indiceColumnaComprobanteAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Número Desde");
+                int indiceColumnaIVAAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "IVA");
+                int indiceColumnaTotalAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Imp. Total");
+                int indiceColumnaCuitAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Nro. Doc. Emisor");
+                int indiceColumnaFechaAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Fecha");
+
+                int indiceColumnaComprobanteHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Comprobante");
+                int indiceColumnaIVAHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "IVA");
+                int indiceColumnaTotalHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Total");
+                int indiceColumnaCuitHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Tipo/Nro.Doc.");
+                int indiceColumnaFechaHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Fecha");
+
+                worksheetArchivoHolistor.Cell(1, ultimaColumnaHolistor + 1).Value = "Detalle";
+                worksheetArchivoAFIP.Cell(1, ultimaColumnaAFIP + 1).Value = "Detalle";
+
+                // Recorrer el diccionario de Holistor
+                foreach (var kvpHolistor in diccionarioHolistor)
+                {
+                    string claveHolistor = kvpHolistor.Key;
+                    var registrosHolistor = kvpHolistor.Value;
+
+                    // Verificar si la clave existe en el diccionario de AFIP                   
+                    if (diccionarioAFIP.ContainsKey(claveHolistor))
+                    {
+                        var registrosAFIP = diccionarioAFIP[claveHolistor];
+
+                        // Ordenar los registros por el valor numérico del comprobante
+                        registrosAFIP = registrosAFIP.OrderByDescending(registro => Convert.ToInt64(registro.Item4)).ToList();
+                        registrosHolistor = registrosHolistor.OrderByDescending(registro => Convert.ToInt64(registro.Item4)).ToList();
+
+                        foreach (var registroHolistor in registrosHolistor)
+                        {
+                            // Señalizar en verde CUIT
+                            worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaCuitHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                            foreach (var registroAFIP in registrosAFIP)
+                            {
+                                int indiceTipoCambio = ObtenerIndiceColumna(worksheetArchivoAFIP, "Tipo Cambio");
+                                double tipoCambio = (double)worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceTipoCambio).Value;
+
+                                // Señalizar en verde CUIT
+                                worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaCuitAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                                // Comparamos por comprobante, importes y fecha
+                                if (registroHolistor.Item2 == registroAFIP.Item2 && registroHolistor.Item3 == registroAFIP.Item3 && registroHolistor.Item4 == registroAFIP.Item4 && registroHolistor.Item5 == registroAFIP.Item5)
+                                {
+                                    // Coincide
+
+                                    // Señalizar en verde ambos comprobantes
+                                    worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaComprobanteHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaPuntoVentaAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaComprobanteAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                                    worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value = " ";
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value = " ";
+
+                                    //Señalizo expresado en dolares
+                                    if (tipoCambio != 1)
+                                    {
+                                        int indiceMoneda = ObtenerIndiceColumna(worksheetArchivoAFIP, "Moneda");
+                                        string moneda = worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceMoneda).Value.ToString();
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value += $"Expresado en {moneda}";
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value = $"Expresado en {moneda} en AFIP";
+                                    }
+
+                                    // Señalizo en verde el IVA
+                                    worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaIVAHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaIVAAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                                    // Señalizo en verde el TOTAL
+                                    worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaTotalHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaTotalAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                                    // Señalizo en verde la FECHA
+                                    worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaFechaHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaFechaAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                }
+                                
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // La clave no existe en el diccionario de AFIP, señalizar en rojo el en Holistor
+                        foreach (var registroHolistor in registrosHolistor)
+                        {
+                            worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaCuitHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                            worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value = "Este cuit no tiene ningun registro en AFIP";
+                        }
+                    }
+                }
+                workbookAFIP.SaveAs(rutaExcelAFIP);
+                workbookHolistor.SaveAs(rutaExcelHolistor);
+            }
+        }
+
+        static void CompararFechaComprobanteHolistor(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelHolistor, string rutaExcelAFIP, double tolerancia)
+        {
+            using (var workbookHolistor = new XLWorkbook(rutaExcelHolistor))
+            using (var workbookAFIP = new XLWorkbook(rutaExcelAFIP))
+            {
+                var worksheetArchivoHolistor = workbookHolistor.Worksheets.First();
+                var worksheetArchivoAFIP = workbookAFIP.Worksheets.First();
+
+                int ultimaColumnaHolistor = worksheetArchivoHolistor.LastColumnUsed().ColumnNumber();
+                int ultimaColumnaAFIP = worksheetArchivoAFIP.LastColumnUsed().ColumnNumber();
+
+                int indiceColumnaPuntoVentaAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Punto de Venta");
+                int indiceColumnaComprobanteAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Número Desde");
+                int indiceColumnaIVAAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "IVA");
+                int indiceColumnaTotalAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Imp. Total");
+                int indiceColumnaCuitAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Nro. Doc. Emisor");
+                int indiceColumnaFechaAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Fecha");
+
+                int indiceColumnaComprobanteHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Comprobante");
+                int indiceColumnaIVAHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "IVA");
+                int indiceColumnaTotalHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Total");
+                int indiceColumnaCuitHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Tipo/Nro.Doc.");
+                int indiceColumnaFechaHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Fecha");
+
+                worksheetArchivoHolistor.Cell(1, ultimaColumnaHolistor + 1).Value = "Detalle";
+                worksheetArchivoAFIP.Cell(1, ultimaColumnaAFIP + 1).Value = "Detalle";
+
+                // Recorrer el diccionario de Holistor
+                foreach (var kvpHolistor in diccionarioHolistor)
+                {
+                    string claveHolistor = kvpHolistor.Key;
+                    var registrosHolistor = kvpHolistor.Value;
+
+                    // Verificar si la clave existe en el diccionario de AFIP                   
+                    if (diccionarioAFIP.ContainsKey(claveHolistor))
+                    {
+                        var registrosAFIP = diccionarioAFIP[claveHolistor];
+
+                        // Ordenar los registros por el valor numérico del comprobante
+                        registrosAFIP = registrosAFIP.OrderByDescending(registro => Convert.ToInt64(registro.Item4)).ToList();
+                        registrosHolistor = registrosHolistor.OrderByDescending(registro => Convert.ToInt64(registro.Item4)).ToList();
+
+                        foreach (var registroHolistor in registrosHolistor)
+                        {
+                            // Señalizar en verde CUIT
+                            worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaCuitHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                            foreach (var registroAFIP in registrosAFIP)
+                            {
+                                int indiceTipoCambio = ObtenerIndiceColumna(worksheetArchivoAFIP, "Tipo Cambio");
+                                double tipoCambio = (double)worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceTipoCambio).Value;
+
+                                // Señalizar en verde CUIT
+                                worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaCuitAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                                // Comparamos por comprobante e importes, ignorando los ya señalizados
+                                if (registroHolistor.Item2 == registroAFIP.Item2 && registroHolistor.Item3 == registroAFIP.Item3 && registroHolistor.Item4 == registroAFIP.Item4 &&
+                                     worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaIVAHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaTotalHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
+                                     worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaComprobanteHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaFechaHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
+                                     worksheetArchivoAFIP.Cell(registroHolistor.Item1, indiceColumnaIVAAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoAFIP.Cell(registroHolistor.Item1, indiceColumnaTotalAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
+                                     worksheetArchivoAFIP.Cell(registroHolistor.Item1, indiceColumnaPuntoVentaAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoAFIP.Cell(registroHolistor.Item1, indiceColumnaComprobanteAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204)  
+                                     && worksheetArchivoAFIP.Cell(registroHolistor.Item1, indiceColumnaFechaAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204))
+                                {
+                                    // Coincide
+
+                                    // Señalizar en verde ambos comprobantes
+                                    worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaComprobanteHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaPuntoVentaAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaComprobanteAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                                    worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value = " ";
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value = " ";
+
+                                    //Señalizo expresado en dolares
+                                    if (tipoCambio != 1)
+                                    {
+                                        int indiceMoneda = ObtenerIndiceColumna(worksheetArchivoAFIP, "Moneda");
+                                        string moneda = worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceMoneda).Value.ToString();
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value += $"Expresado en {moneda}";
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value = $"Expresado en {moneda} en AFIP";
+                                    }
+
+                                    // Señalizo en verde el IVA
+                                    worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaIVAHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaIVAAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                                    // Señalizo en verde el TOTAL
+                                    worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaTotalHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaTotalAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                                    // Comparar la FECHA
+                                    if (registroHolistor.Item5 == registroAFIP.Item5)
+                                    {
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaFechaHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaFechaAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    }
+                                    else
+                                    {
+                                        //Esta mal la FECHA
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaFechaHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaFechaAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value += " FECHA esta mal";
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value += " FECHA esta mal";
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // La clave no existe en el diccionario de AFIP, señalizar en rojo el en Holistor
+                        foreach (var registroHolistor in registrosHolistor)
+                        {
+                            worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaCuitHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                            worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value = "Este cuit no tiene ningun registro en AFIP";
+                        }
+                    }
+                }
+                workbookAFIP.SaveAs(rutaExcelAFIP);
+                workbookHolistor.SaveAs(rutaExcelHolistor);
+            }
+        }
+
+        static void CompararComprobanteHolistor(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelHolistor, string rutaExcelAFIP, double tolerancia)
+        {
+            using (var workbookHolistor = new XLWorkbook(rutaExcelHolistor))
+            using (var workbookAFIP = new XLWorkbook(rutaExcelAFIP))
+            {
+                var worksheetArchivoHolistor = workbookHolistor.Worksheets.First();
+                var worksheetArchivoAFIP = workbookAFIP.Worksheets.First();
+
+                int ultimaColumnaHolistor = worksheetArchivoHolistor.LastColumnUsed().ColumnNumber();
+                int ultimaColumnaAFIP = worksheetArchivoAFIP.LastColumnUsed().ColumnNumber();
+
+                int indiceColumnaPuntoVentaAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Punto de Venta");
+                int indiceColumnaComprobanteAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Número Desde");
+                int indiceColumnaIVAAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "IVA");
+                int indiceColumnaTotalAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Imp. Total");
+                int indiceColumnaCuitAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Nro. Doc. Emisor");
+                int indiceColumnaFechaAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Fecha");
+
+                int indiceColumnaComprobanteHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Comprobante");
+                int indiceColumnaIVAHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "IVA");
+                int indiceColumnaTotalHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Total");
+                int indiceColumnaCuitHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Tipo/Nro.Doc.");
+                int indiceColumnaFechaHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Fecha");
+
+                worksheetArchivoHolistor.Cell(1, ultimaColumnaHolistor + 1).Value = "Detalle";
+                worksheetArchivoAFIP.Cell(1, ultimaColumnaAFIP + 1).Value = "Detalle";
+
+                // Recorrer el diccionario de Holistor
+                foreach (var kvpHolistor in diccionarioHolistor)
+                {
+                    string claveHolistor = kvpHolistor.Key;
+                    var registrosHolistor = kvpHolistor.Value;
+
+                    // Verificar si la clave existe en el diccionario de AFIP                   
+                    if (diccionarioAFIP.ContainsKey(claveHolistor))
+                    {
+                        var registrosAFIP = diccionarioAFIP[claveHolistor];
+
+                        // Ordenar los registros por el valor numérico del comprobante
+                        registrosAFIP = registrosAFIP.OrderByDescending(registro => Convert.ToInt64(registro.Item4)).ToList();
+                        registrosHolistor = registrosHolistor.OrderByDescending(registro => Convert.ToInt64(registro.Item4)).ToList();
+
+                        foreach (var registroHolistor in registrosHolistor)
+                        {
+                            // Señalizar en verde CUIT
+                            worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaCuitHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                            foreach (var registroAFIP in registrosAFIP)
+                            {
+                                int indiceTipoCambio = ObtenerIndiceColumna(worksheetArchivoAFIP, "Tipo Cambio");
+                                double tipoCambio = (double)worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceTipoCambio).Value;
+
+                                // Señalizar en verde CUIT
+                                worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaCuitAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                                // Comparamos por comprobante, ignorando los ya señalizados
+                                if (registroHolistor.Item4 == registroAFIP.Item4 &&
+                                     worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaIVAHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaTotalHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
+                                     worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaComprobanteHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaFechaHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
+                                     worksheetArchivoAFIP.Cell(registroHolistor.Item1, indiceColumnaIVAAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoAFIP.Cell(registroHolistor.Item1, indiceColumnaTotalAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
+                                     worksheetArchivoAFIP.Cell(registroHolistor.Item1, indiceColumnaPuntoVentaAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoAFIP.Cell(registroHolistor.Item1, indiceColumnaComprobanteAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204)
+                                     && worksheetArchivoAFIP.Cell(registroHolistor.Item1, indiceColumnaFechaAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204))
+                                {
+                                    // Coincide
+
+                                    // Señalizar en verde ambos comprobantes
+                                    worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaComprobanteHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaPuntoVentaAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaComprobanteAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                                    worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value = " ";
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value = " ";
+
+                                    //Señalizo expresado en dolares
+                                    if (tipoCambio != 1)
+                                    {
+                                        int indiceMoneda = ObtenerIndiceColumna(worksheetArchivoAFIP, "Moneda");
+                                        string moneda = worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceMoneda).Value.ToString();
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value += $"Expresado en {moneda}";
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value = $"Expresado en {moneda} en AFIP";
+                                    }
+
+                                    // Comparar el IVA
+                                    if (registroHolistor.Item2 == registroAFIP.Item2)
+                                    {
+                                        // Señalizo en verde el IVA
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaIVAHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaIVAAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    }
+                                    else
+                                    {
+                                        //Esta mal el IVA
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaIVAHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaIVAAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value += "IVA esta mal";
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value += "IVA esta mal";
+                                    }
+
+                                    // Comparar el TOTAL
+                                    if (registroHolistor.Item3 == registroAFIP.Item3)
+                                    {
+                                        // Señalizo en verde el TOTAL
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaTotalHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaTotalAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    }
+                                    else
+                                    {
+                                        //Esta mal el TOTAL
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaTotalHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaTotalAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value += "TOTAL esta mal";
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value += "TOTAL esta mal";
+                                    }
+
+                                    // Comparar la FECHA
+                                    if (registroHolistor.Item5 == registroAFIP.Item5)
+                                    {
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaFechaHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaFechaAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    }
+                                    else
+                                    {
+                                        //Esta mal la FECHA
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaFechaHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaFechaAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value += " FECHA esta mal";
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value += " FECHA esta mal";
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // La clave no existe en el diccionario de AFIP, señalizar en rojo el en Holistor
+                        foreach (var registroHolistor in registrosHolistor)
+                        {
+                            worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaCuitHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                            worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value = "Este cuit no tiene ningun registro en AFIP";
+                        }
+                    }
+                }
+                workbookAFIP.SaveAs(rutaExcelAFIP);
+                workbookHolistor.SaveAs(rutaExcelHolistor);
+            }
+        }
+
+        static void CompararImportesHolistor(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelHolistor, string rutaExcelAFIP, double tolerancia)
+        {
+            using (var workbookHolistor = new XLWorkbook(rutaExcelHolistor))
+            using (var workbookAFIP = new XLWorkbook(rutaExcelAFIP))
+            {
+                var worksheetArchivoHolistor = workbookHolistor.Worksheets.First();
+                var worksheetArchivoAFIP = workbookAFIP.Worksheets.First();
+
+                int ultimaColumnaHolistor = worksheetArchivoHolistor.LastColumnUsed().ColumnNumber();
+                int ultimaColumnaAFIP = worksheetArchivoAFIP.LastColumnUsed().ColumnNumber();
+
+                int indiceColumnaPuntoVentaAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Punto de Venta");
+                int indiceColumnaComprobanteAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Número Desde");
+                int indiceColumnaIVAAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "IVA");
+                int indiceColumnaTotalAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Imp. Total");
+                int indiceColumnaCuitAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Nro. Doc. Emisor");
+                int indiceColumnaFechaAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Fecha");
+
+                int indiceColumnaComprobanteHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Comprobante");
+                int indiceColumnaIVAHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "IVA");
+                int indiceColumnaTotalHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Total");
+                int indiceColumnaCuitHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Tipo/Nro.Doc.");
+                int indiceColumnaFechaHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Fecha");
+
+                worksheetArchivoHolistor.Cell(1, ultimaColumnaHolistor + 1).Value = "Detalle";
+                worksheetArchivoAFIP.Cell(1, ultimaColumnaAFIP + 1).Value = "Detalle";
+
+                // Recorrer el diccionario de Holistor
+                foreach (var kvpHolistor in diccionarioHolistor)
+                {
+                    string claveHolistor = kvpHolistor.Key;
+                    var registrosHolistor = kvpHolistor.Value;
+
+                    // Verificar si la clave existe en el diccionario de AFIP                   
+                    if (diccionarioAFIP.ContainsKey(claveHolistor))
+                    {
+                        var registrosAFIP = diccionarioAFIP[claveHolistor];
+
+                        // Ordenar los registros por el valor numérico del comprobante
+                        registrosAFIP = registrosAFIP.OrderByDescending(registro => Convert.ToInt64(registro.Item4)).ToList();
+                        registrosHolistor = registrosHolistor.OrderByDescending(registro => Convert.ToInt64(registro.Item4)).ToList();
+
+                        foreach (var registroHolistor in registrosHolistor)
+                        {
+                            // Señalizar en verde CUIT
+                            worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaCuitHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                            foreach (var registroAFIP in registrosAFIP)
+                            {
+                                int indiceTipoCambio = ObtenerIndiceColumna(worksheetArchivoAFIP, "Tipo Cambio");
+                                double tipoCambio = (double)worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceTipoCambio).Value;
+
+                                // Señalizar en verde CUIT
+                                worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaCuitAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                                // Comparamos por importes, ignorando los ya señalizados
+                                if (registroHolistor.Item2 == registroAFIP.Item2 && registroHolistor.Item3 == registroAFIP.Item3 &&
+                                     worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaIVAHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaTotalHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
+                                     worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaComprobanteHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaFechaHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
+                                     worksheetArchivoAFIP.Cell(registroHolistor.Item1, indiceColumnaIVAAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoAFIP.Cell(registroHolistor.Item1, indiceColumnaTotalAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
+                                     worksheetArchivoAFIP.Cell(registroHolistor.Item1, indiceColumnaPuntoVentaAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoAFIP.Cell(registroHolistor.Item1, indiceColumnaComprobanteAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204)
+                                     && worksheetArchivoAFIP.Cell(registroHolistor.Item1, indiceColumnaFechaAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204))
+                                {
+                                    // Coinciden los importes
+                                    // 
+                                    worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value = " ";
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value = " ";
+
+                                    //Señalizo expresado en dolares
+                                    if (tipoCambio != 1)
+                                    {
+                                        int indiceMoneda = ObtenerIndiceColumna(worksheetArchivoAFIP, "Moneda");
+                                        string moneda = worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceMoneda).Value.ToString();
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value += $"Expresado en {moneda}";
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value = $"Expresado en {moneda} en AFIP";
+                                    }
+
+                                    // Señalizo en verde el IVA
+                                    worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaIVAHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaIVAAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+  
+
+                                    // Señalizo en verde el TOTAL
+                                    worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaTotalHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaTotalAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                                    // Comparar la FECHA
+                                    if (registroHolistor.Item5 == registroAFIP.Item5)
+                                    {
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaFechaHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaFechaAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    }
+                                    else
+                                    {
+                                        //Esta mal la FECHA
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaFechaHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaFechaAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value += " FECHA esta mal";
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value += " FECHA esta mal";
+                                    }
+
+                                    // Comparar el COMPROBANTE
+                                    if (registroHolistor.Item4 == registroAFIP.Item4)
+                                    {
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaComprobanteHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaPuntoVentaAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaComprobanteAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    }
+                                    else
+                                    {
+                                        //Esta mal el COMPROBANTE
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaComprobanteHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaPuntoVentaAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaComprobanteAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value += " COMPROBANTE esta mal";
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value += " COMPROBANTE esta mal";
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // La clave no existe en el diccionario de AFIP, señalizar en rojo el en Holistor
+                        foreach (var registroHolistor in registrosHolistor)
+                        {
+                            worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaCuitHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                            worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value = "Este cuit no tiene ningun registro en AFIP";
+                        }
+                    }
+                }
+                workbookAFIP.SaveAs(rutaExcelAFIP);
+                workbookHolistor.SaveAs(rutaExcelHolistor);
+            }
+        }
+
+
         //Comparacion para los archivos de contabilidad que no son de Holistor
         static void CompararYMarcarFilasContabilidad(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioContabilidad, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelContabilidad, string rutaExcelAFIP,
             int indiceColumnaCUIT, int indiceColumnaPuntoVenta, int indiceColumnaNumeroComprobante, int indiceColumnaTotal, int indiceColumnaIVA, double tolerancia)
@@ -926,7 +1445,7 @@ namespace Comparador
             {
                 if (comboBoxEsquemas.SelectedItem.ToString() == esquema.Nombre)
                 {
-                    columnasForm.cargarDatos(esquema.IndiceCuit, esquema.IndiceIVA, esquema.IndiceTotal, esquema.IndicePuntoVenta, esquema.IndiceNumeroComprobante, esquema.Nombre);
+                    columnasForm.cargarDatos(esquema.IndiceCuit, esquema.IndiceIVA, esquema.IndiceTotal, esquema.IndicePuntoVenta, esquema.IndiceNumeroComprobante, esquema.Nombre, esquema.IndiceFecha);
                 }
             }
 
@@ -957,9 +1476,12 @@ namespace Comparador
         [JsonProperty("IndiceColumnaTotal")]
         public int IndiceTotal { get; set; }
 
+        [JsonProperty("IndiceColumnaFecha")]
+        public int IndiceFecha { get; set; }
+
         public Esquema() { }
 
-        public Esquema(int indiceCuit, int indicePuntoVenta, int indiceNumeroComprobante, int indiceIVA, int indiceTotal, string nombre)
+        public Esquema(int indiceCuit, int indicePuntoVenta, int indiceNumeroComprobante, int indiceIVA, int indiceTotal, string nombre, int indiceFecha)
         {
             IndiceCuit = indiceCuit;
             IndicePuntoVenta = indicePuntoVenta;
@@ -967,6 +1489,7 @@ namespace Comparador
             IndiceIVA = indiceIVA;
             IndiceTotal = indiceTotal;
             Nombre = nombre;
+            IndiceFecha = indiceFecha;
         }
     }
 }

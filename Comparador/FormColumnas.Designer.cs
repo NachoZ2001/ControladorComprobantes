@@ -42,11 +42,14 @@
             numericUpDownTotal = new NumericUpDown();
             buttonGuardar = new Button();
             buttonCancelar = new Button();
+            textBoxFecha = new TextBox();
+            numericUpDownFecha = new NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)numericUpDownCuit).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownPuntoVenta).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownNumeroComprobante).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownIVA).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownTotal).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownFecha).BeginInit();
             SuspendLayout();
             // 
             // numericUpDownCuit
@@ -212,7 +215,7 @@
             buttonGuardar.FlatStyle = FlatStyle.Flat;
             buttonGuardar.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             buttonGuardar.ForeColor = SystemColors.ButtonFace;
-            buttonGuardar.Location = new Point(164, 264);
+            buttonGuardar.Location = new Point(164, 305);
             buttonGuardar.Name = "buttonGuardar";
             buttonGuardar.Size = new Size(75, 23);
             buttonGuardar.TabIndex = 12;
@@ -226,7 +229,7 @@
             buttonCancelar.FlatStyle = FlatStyle.Flat;
             buttonCancelar.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             buttonCancelar.ForeColor = SystemColors.ButtonFace;
-            buttonCancelar.Location = new Point(70, 264);
+            buttonCancelar.Location = new Point(70, 305);
             buttonCancelar.Name = "buttonCancelar";
             buttonCancelar.Size = new Size(75, 23);
             buttonCancelar.TabIndex = 13;
@@ -234,12 +237,40 @@
             buttonCancelar.UseVisualStyleBackColor = false;
             buttonCancelar.Click += buttonCancelar_Click;
             // 
+            // textBoxFecha
+            // 
+            textBoxFecha.BackColor = Color.BlueViolet;
+            textBoxFecha.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            textBoxFecha.ForeColor = SystemColors.ButtonFace;
+            textBoxFecha.Location = new Point(12, 253);
+            textBoxFecha.Name = "textBoxFecha";
+            textBoxFecha.ReadOnly = true;
+            textBoxFecha.Size = new Size(133, 23);
+            textBoxFecha.TabIndex = 14;
+            textBoxFecha.Text = "Fecha";
+            textBoxFecha.TextAlign = HorizontalAlignment.Center;
+            // 
+            // numericUpDownFecha
+            // 
+            numericUpDownFecha.BackColor = Color.BlueViolet;
+            numericUpDownFecha.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            numericUpDownFecha.ForeColor = SystemColors.ButtonFace;
+            numericUpDownFecha.Location = new Point(164, 253);
+            numericUpDownFecha.Minimum = new decimal(new int[] { 100, 0, 0, int.MinValue });
+            numericUpDownFecha.Name = "numericUpDownFecha";
+            numericUpDownFecha.Size = new Size(120, 23);
+            numericUpDownFecha.TabIndex = 15;
+            numericUpDownFecha.TextAlign = HorizontalAlignment.Center;
+            numericUpDownFecha.Value = new decimal(new int[] { 1, 0, 0, int.MinValue });
+            // 
             // FormColumnas
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Purple;
-            ClientSize = new Size(303, 305);
+            ClientSize = new Size(303, 353);
+            Controls.Add(numericUpDownFecha);
+            Controls.Add(textBoxFecha);
             Controls.Add(buttonCancelar);
             Controls.Add(buttonGuardar);
             Controls.Add(numericUpDownTotal);
@@ -262,6 +293,7 @@
             ((System.ComponentModel.ISupportInitialize)numericUpDownNumeroComprobante).EndInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownIVA).EndInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownTotal).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownFecha).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -282,5 +314,7 @@
         private NumericUpDown numericUpDownTotal;
         private Button buttonGuardar;
         private Button buttonCancelar;
+        private TextBox textBoxFecha;
+        private NumericUpDown numericUpDownFecha;
     }
 }
