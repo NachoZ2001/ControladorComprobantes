@@ -204,6 +204,94 @@ namespace Comparador
             MessageBox.Show("Proceso completado", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        static int ExtraerTipoFacturaAFIP(string tipo)
+        {
+            var diccionarioTiposFacturas = new Dictionary<string, int>
+            {
+                {"Factura A", 1},
+                {"FAC A", 1},
+                {"FA A", 1},
+                {"Factura B", 2},
+                {"FAC B", 2},
+                {"FA B", 2},
+                {"Factura C", 3},
+                {"FAC C", 3},
+                {"FA C", 3},
+                {"Nota de Crédito A", 4},
+                {"NC A", 4},
+                {"Nota de Débito A", 5},
+                {"ND A", 5},
+                {"Recibo A", 1},
+                {"Recibo B", 2},
+                {"Recibo C", 3}
+            };
+
+            // Normalizar cadenas y extraer tipo y letra para comparación con diccionarioAFIP
+            var normalizadoAFIP = NormalizarAFIP(tipo);
+
+            return ObtenerValorDeDiccionario(diccionarioTiposFacturas, normalizadoAFIP);
+        }
+
+        static int ExtraerTipoFacturaHolistor(string tipo)
+        {
+            var diccionarioTiposFacturas = new Dictionary<string, int>
+            {
+                {"Factura A", 1},
+                {"FAC A", 1},
+                {"FA A", 1},
+                {"Factura B", 2},
+                {"FAC B", 2},
+                {"FA B", 2},
+                {"Factura C", 3},
+                {"FAC C", 3},
+                {"FA C", 3},
+                {"Nota de Crédito A", 4},
+                {"NC A", 4},
+                {"Nota de Débito A", 5},
+                {"ND A", 5},
+                {"Recibo A", 1},
+                {"Recibo B", 2},
+                {"Recibo C", 3}
+            };
+
+            // Normalizar cadenas y extraer tipo y letra para comparación con diccionarioAFIP
+            var normalizadoHolistor = NormalizarHolistor(tipo);
+
+            return ObtenerValorDeDiccionario(diccionarioTiposFacturas, normalizadoHolistor);
+        }
+
+        // Función para normalizar cadena de AFIP (extraer tipo y letra después del identificador numérico)
+        static string NormalizarAFIP(string input)
+        {
+            int separatorIndex = input.IndexOf('-');
+            if (separatorIndex >= 0)
+            {
+                return input.Substring(separatorIndex + 1).Trim();
+            }
+            return input.Trim();
+        }
+
+        // Función para normalizar cadena de Excel (extraer tipo y letra al principio)
+        static string NormalizarHolistor(string input)
+        {
+            string[] parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 2)
+            {
+                return parts[0] + " " + parts[1];
+            }
+            return input.Trim();
+        }
+
+        // Función para buscar valor en el diccionario
+        static int ObtenerValorDeDiccionario(Dictionary<string, int> dictionary, string key)
+        {
+            if (dictionary.TryGetValue(key, out int value))
+            {
+                return value;
+            }
+            return -1; // Valor por defecto o manejo de error según necesidad
+        }
+
         private void RealizarComparacion(string rutaExcelAfip, string rutaExcelContabilidad)
         {
             int indiceColumnaCUIT = columnas[0];
@@ -298,9 +386,9 @@ namespace Comparador
         }
 
         // Función para armar el diccionario de Contabilidad --> {CUIT}: (fila, iva, total, comprobante, fecha)
-        static Dictionary<string, List<(int, double, double, string, DateTime)>> ArmarDiccionarioContabilidad(string rutaExcel, int indiceColumnaCUIT, int indiceColumnaPuntoVenta, int indiceColumnaNumeroComprobante, int indiceColumnaTotal, int indiceColumnaIVA, int indiceColumnaFecha)
+        static Dictionary<string, List<(int, double, double, string, DateTime, int)>> ArmarDiccionarioContabilidad(string rutaExcel, int indiceColumnaCUIT, int indiceColumnaPuntoVenta, int indiceColumnaNumeroComprobante, int indiceColumnaTotal, int indiceColumnaIVA, int indiceColumnaFecha)
         {
-            var diccionario = new Dictionary<string, List<(int, double, double, string, DateTime)>>();
+            var diccionario = new Dictionary<string, List<(int, double, double, string, DateTime, int)>>();
 
             using (var workbook = new XLWorkbook(rutaExcel))
             {
@@ -339,10 +427,10 @@ namespace Comparador
                         // Agregar al diccionario
                         if (!diccionario.ContainsKey(cuit))
                         {
-                            diccionario[cuit] = new List<(int, double, double, string, DateTime)>();
+                            diccionario[cuit] = new List<(int, double, double, string, DateTime, int)>();
                         }
 
-                        diccionario[cuit].Add((fila, iva, total, numeroComprobante, fechaArchivoContabilidad));
+                        diccionario[cuit].Add((fila, iva, total, numeroComprobante, fechaArchivoContabilidad, 1));
                     }
                 }
                 //Arma cuando tenga punto de venta y comprobante separados en distintas columnas
@@ -381,10 +469,10 @@ namespace Comparador
                         // Agregar al diccionario
                         if (!diccionario.ContainsKey(cuit))
                         {
-                            diccionario[cuit] = new List<(int, double, double, string, DateTime)>();
+                            diccionario[cuit] = new List<(int, double, double, string, DateTime, int)>();
                         }
 
-                        diccionario[cuit].Add((fila, iva, total, comprobanteCompleto, fechaArchivoContabilidad));
+                        diccionario[cuit].Add((fila, iva, total, comprobanteCompleto, fechaArchivoContabilidad, 1));
                     }
                 }
             }
@@ -392,10 +480,10 @@ namespace Comparador
             return diccionario;
         }
 
-        // Función para armar el diccionario de Holistor --> {CUIT}: (fila, iva, total, comprobante, fecha)
-        static Dictionary<string, List<(int, double, double, string, DateTime)>> ArmarDiccionarioHolistor(string rutaExcel)
+        // Función para armar el diccionario de Holistor --> {CUIT}: (fila, iva, total, comprobante, fecha, tipo comprobante)
+        static Dictionary<string, List<(int, double, double, string, DateTime, int)>> ArmarDiccionarioHolistor(string rutaExcel)
         {
-            var diccionario = new Dictionary<string, List<(int, double, double, string, DateTime)>>();
+            var diccionario = new Dictionary<string, List<(int, double, double, string, DateTime, int)>>();
 
             using (var workbook = new XLWorkbook(rutaExcel))
             {
@@ -409,6 +497,7 @@ namespace Comparador
                     for (int fila = 2; fila <= ultimaFila; fila++) // Empezamos desde la fila 2, asumiendo que la fila 1 es encabezados
                     {
                         string numeroComprobante = worksheet.Cell(fila, indiceColumnaComprobante).GetString();
+                        string Comprobante = numeroComprobante;
 
                         // Procesar el número de comprobante
                         numeroComprobante = ProcesarNumeros(numeroComprobante);
@@ -435,13 +524,16 @@ namespace Comparador
                         string stringFechaArchivo1 = worksheet.Cell(fila, indiceFechaArchivoHolistor).GetString();
                         DateTime fechaArchivoHolistor = DateTime.Parse(stringFechaArchivo1);
 
+                        // Obtener el valor del tipo de comprobante mapeado
+                        int tipoComprobante = ExtraerTipoFacturaHolistor(Comprobante);
+
                         // Agregar al diccionario
                         if (!diccionario.ContainsKey(cuit))
                         {
-                            diccionario[cuit] = new List<(int, double, double, string,DateTime)>();
+                            diccionario[cuit] = new List<(int, double, double, string,DateTime, int)>();
                         }
 
-                        diccionario[cuit].Add((fila, iva, total, numeroComprobante, fechaArchivoHolistor));
+                        diccionario[cuit].Add((fila, iva, total, numeroComprobante, fechaArchivoHolistor, tipoComprobante));
                     }
                 }
                 else
@@ -453,10 +545,10 @@ namespace Comparador
             return diccionario;
         }
 
-        // Función para armar el diccionario de AFIP --> {CUIT}: (fila, iva, total, comprobante, fecha)
-        static Dictionary<string, List<(int, double, double, string, DateTime)>> ArmarDiccionarioAFIP(string rutaExcel)
+        // Función para armar el diccionario de AFIP --> {CUIT}: (fila, iva, total, comprobante, fecha, tipo comprobante)
+        static Dictionary<string, List<(int, double, double, string, DateTime, int)>> ArmarDiccionarioAFIP(string rutaExcel)
         {
-            var diccionario = new Dictionary<string, List<(int, double, double, string, DateTime)>>();
+            var diccionario = new Dictionary<string, List<(int, double, double, string, DateTime, int)>>();
 
             using (var workbook = new XLWorkbook(rutaExcel))
             {
@@ -467,6 +559,7 @@ namespace Comparador
                 int indiceColumnaTotal = ObtenerIndiceColumna(worksheet, "Imp. Total");
                 int indiceColumnaCuit = ObtenerIndiceColumna(worksheet, "Nro. Doc. Emisor");
                 int indiceColumnaFecha = ObtenerIndiceColumna(worksheet, "Fecha");
+                int indiceColumnaTipo = ObtenerIndiceColumna(worksheet, "Tipo");
 
                 if (indiceColumnaPuntoVenta != -1 && indiceColumnaComprobante != -1 && indiceColumnaIVA != -1 && indiceColumnaTotal != -1 && indiceColumnaCuit != -1 && indiceColumnaFecha != -1)
                 {
@@ -495,16 +588,20 @@ namespace Comparador
                         // Obtener valor de la columna CUIT
                         string cuit = worksheet.Cell(fila, indiceColumnaCuit).GetString();
 
+                        // Obtener el valor de la columna Fecha
                         string stringFechaArchivo1 = worksheet.Cell(fila, indiceColumnaFecha).GetString();
                         DateTime fechaArchivo1 = DateTime.Parse(stringFechaArchivo1);
+
+                        // Obtener el valor mapeado del tipo de comprobante
+                        int tipoMapeado = ExtraerTipoFacturaAFIP(worksheet.Cell(fila, indiceColumnaTipo).GetString());
 
                         // Agregar al diccionario
                         if (!diccionario.ContainsKey(cuit))
                         {
-                            diccionario[cuit] = new List<(int, double, double, string, DateTime)>();
+                            diccionario[cuit] = new List<(int, double, double, string, DateTime, int)>();
                         }
 
-                        diccionario[cuit].Add((fila, iva, total, comprobanteCompleto, fechaArchivo1));
+                        diccionario[cuit].Add((fila, iva, total, comprobanteCompleto, fechaArchivo1, tipoMapeado));
                     }
                 }
                 else
@@ -517,7 +614,7 @@ namespace Comparador
         }
 
         //Comparacion para los archivos de contabilidad que son de Holistor
-        private async void CompararYMarcarFilasHolistor(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelHolistor, string rutaExcelAFIP, double tolerancia)
+        private async void CompararYMarcarFilasHolistor(Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioAFIP, string rutaExcelHolistor, string rutaExcelAFIP, double tolerancia)
         {
             // Primera comparacion
             CompararFechaImporteComprobanteHolistor(diccionarioHolistor, diccionarioAFIP, rutaExcelHolistor, rutaExcelAFIP, tolerancia);
@@ -535,7 +632,7 @@ namespace Comparador
             MarcarNoSeñalizadosEnRojoHolistor(diccionarioHolistor, diccionarioAFIP, rutaExcelHolistor);
         }
 
-        private async void CompararFechaImporteComprobanteHolistor(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelHolistor, string rutaExcelAFIP, double tolerancia)
+        private async void CompararFechaImporteComprobanteHolistor(Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioAFIP, string rutaExcelHolistor, string rutaExcelAFIP, double tolerancia)
         {
             using (var workbookHolistor = new XLWorkbook(rutaExcelHolistor))
             using (var workbookAFIP = new XLWorkbook(rutaExcelAFIP))
@@ -555,6 +652,7 @@ namespace Comparador
                 int indiceColumnaTotalAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Imp. Total");
                 int indiceColumnaCuitAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Nro. Doc. Emisor");
                 int indiceColumnaFechaAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Fecha");
+                int indiceColumnaTipoComprobanteAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Tipo");
 
                 int indiceColumnaComprobanteHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Comprobante");
                 int indiceColumnaIVAHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "IVA");
@@ -594,8 +692,8 @@ namespace Comparador
                                 worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaCuitAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
 
                                 
-                                // Comparamos por comprobante, importes y fecha
-                                if ((Math.Abs(Math.Abs(registroHolistor.Item2) - Math.Abs(registroAFIP.Item2 * tipoCambio)) <= tolerancia) && (Math.Abs(Math.Abs(registroHolistor.Item3) - Math.Abs(registroAFIP.Item3 * tipoCambio)) <= tolerancia) && registroHolistor.Item4 == registroAFIP.Item4 && registroHolistor.Item5 == registroAFIP.Item5)
+                                // Comparamos por comprobante, importes, fecha y tipo de comprobante
+                                if ((Math.Abs(Math.Abs(registroHolistor.Item2) - Math.Abs(registroAFIP.Item2 * tipoCambio)) <= tolerancia) && (Math.Abs(Math.Abs(registroHolistor.Item3) - Math.Abs(registroAFIP.Item3 * tipoCambio)) <= tolerancia) && registroHolistor.Item4 == registroAFIP.Item4 && registroHolistor.Item5 == registroAFIP.Item5 && registroHolistor.Item6 == registroAFIP.Item6)
                                 {
                                     // Coincide
 
@@ -626,8 +724,12 @@ namespace Comparador
                                     // Señalizo en verde la FECHA
                                     worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaFechaHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
                                     worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaFechaAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                                    // Señalizo en verde el TIPO de COMPROBANTE
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaTipoComprobanteAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    // El tipo de comprobante de Holistor ya lo señalizo arriba cuando marco los comprobantes
                                 }
-                                
+
                             }
                         }
                     }
@@ -646,7 +748,7 @@ namespace Comparador
             }
         }
 
-        private async void CompararImporteComprobanteHolistor(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelHolistor, string rutaExcelAFIP, double tolerancia)
+        private async void CompararImporteComprobanteHolistor(Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioAFIP, string rutaExcelHolistor, string rutaExcelAFIP, double tolerancia)
         {
             using (var workbookHolistor = new XLWorkbook(rutaExcelHolistor))
             using (var workbookAFIP = new XLWorkbook(rutaExcelAFIP))
@@ -663,6 +765,7 @@ namespace Comparador
                 int indiceColumnaTotalAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Imp. Total");
                 int indiceColumnaCuitAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Nro. Doc. Emisor");
                 int indiceColumnaFechaAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Fecha");
+                int indiceColumnaTipoComprobanteAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Tipo");
 
                 int indiceColumnaComprobanteHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Comprobante");
                 int indiceColumnaIVAHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "IVA");
@@ -701,8 +804,8 @@ namespace Comparador
                                 // Señalizar en verde CUIT
                                 worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaCuitAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
 
-                                // Comparamos por comprobante e importes, ignorando los ya señalizados
-                                if ((Math.Abs(Math.Abs(registroHolistor.Item2) - Math.Abs(registroAFIP.Item2 * tipoCambio)) <= tolerancia) && (Math.Abs(Math.Abs(registroHolistor.Item3) - Math.Abs(registroAFIP.Item3 * tipoCambio)) <= tolerancia) && registroHolistor.Item4 == registroAFIP.Item4 &&
+                                // Comparamos por comprobante, tipo de comprobante e importes, ignorando los ya señalizados
+                                if ((Math.Abs(Math.Abs(registroHolistor.Item2) - Math.Abs(registroAFIP.Item2 * tipoCambio)) <= tolerancia) && (Math.Abs(Math.Abs(registroHolistor.Item3) - Math.Abs(registroAFIP.Item3 * tipoCambio)) <= tolerancia) && registroHolistor.Item4 == registroAFIP.Item4 && registroHolistor.Item6 == registroAFIP.Item6 &&
                                      worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaIVAHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaTotalHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
                                      worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaComprobanteHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaFechaHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
                                      worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaIVAAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaTotalAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
@@ -711,7 +814,7 @@ namespace Comparador
                                 {
                                     // Coincide
 
-                                    // Señalizar en verde ambos comprobantes
+                                    // Señalizar en verde ambos comprobantes (en esta se señaliza tambien el tipo de comprobante de HOLISTOR)
                                     worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaComprobanteHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
                                     worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaPuntoVentaAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
                                     worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaComprobanteAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
@@ -735,6 +838,9 @@ namespace Comparador
                                     // Señalizo en verde el TOTAL
                                     worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaTotalHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
                                     worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaTotalAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+
+                                    // Señalizo en verde el TIPO de COMPROBANTE de AFIP
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaTipoComprobanteAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
 
                                     // Comparar la FECHA
                                     if (registroHolistor.Item5 == registroAFIP.Item5)
@@ -770,7 +876,7 @@ namespace Comparador
             }
         }
 
-        private async void CompararComprobanteHolistor(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelHolistor, string rutaExcelAFIP, double tolerancia)
+        private async void CompararComprobanteHolistor(Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioAFIP, string rutaExcelHolistor, string rutaExcelAFIP, double tolerancia)
         {
             using (var workbookHolistor = new XLWorkbook(rutaExcelHolistor))
             using (var workbookAFIP = new XLWorkbook(rutaExcelAFIP))
@@ -787,6 +893,7 @@ namespace Comparador
                 int indiceColumnaTotalAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Imp. Total");
                 int indiceColumnaCuitAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Nro. Doc. Emisor");
                 int indiceColumnaFechaAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Fecha");
+                int indiceColumnaTipoComprobanteAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Tipo");
 
                 int indiceColumnaComprobanteHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Comprobante");
                 int indiceColumnaIVAHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "IVA");
@@ -825,8 +932,8 @@ namespace Comparador
                                 // Señalizar en verde CUIT
                                 worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaCuitAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
 
-                                // Comparamos por comprobante, ignorando los ya señalizados
-                                if (registroHolistor.Item4 == registroAFIP.Item4 &&
+                                // Comparamos por comprobante y tipo del mismo, ignorando los ya señalizados
+                                if (registroHolistor.Item4 == registroAFIP.Item4 && registroHolistor.Item6 == registroAFIP.Item6 &&
                                      worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaIVAHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaTotalHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
                                      worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaComprobanteHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaFechaHolistor).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
                                      worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaIVAAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) && worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaTotalAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
@@ -835,13 +942,16 @@ namespace Comparador
                                 {
                                     // Coincide
 
-                                    // Señalizar en verde ambos comprobantes
+                                    // Señalizar en verde ambos comprobantes (en esta señalizo tambien el tipo de comprobante de HOLISTOR)
                                     worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaComprobanteHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
                                     worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaPuntoVentaAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
                                     worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaComprobanteAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
 
                                     worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value = " ";
                                     worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value = " ";
+
+                                    // Señalizo el TIPO de COMPROBANTE de AFIP
+                                    worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaTipoComprobanteAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
 
                                     //Señalizo expresado en dolares
                                     if (tipoCambio != 1)
@@ -918,7 +1028,7 @@ namespace Comparador
             }
         }
 
-        private async void CompararImportesHolistor(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelHolistor, string rutaExcelAFIP, double tolerancia)
+        private async void CompararImportesHolistor(Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioAFIP, string rutaExcelHolistor, string rutaExcelAFIP, double tolerancia)
         {
             using (var workbookHolistor = new XLWorkbook(rutaExcelHolistor))
             using (var workbookAFIP = new XLWorkbook(rutaExcelAFIP))
@@ -935,6 +1045,7 @@ namespace Comparador
                 int indiceColumnaTotalAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Imp. Total");
                 int indiceColumnaCuitAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Nro. Doc. Emisor");
                 int indiceColumnaFechaAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Fecha");
+                int indiceColumnaTipoComprobanteAFIP = ObtenerIndiceColumna(worksheetArchivoAFIP, "Tipo");
 
                 int indiceColumnaComprobanteHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "Comprobante");
                 int indiceColumnaIVAHolistor = ObtenerIndiceColumna(worksheetArchivoHolistor, "IVA");
@@ -1035,6 +1146,21 @@ namespace Comparador
                                         worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value += " COMPROBANTE esta mal";
                                         worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value += " COMPROBANTE esta mal";
                                     }
+
+                                    // Comparar el TIPO de COMPROBANTE
+                                    if (registroHolistor.Item6 == registroAFIP.Item6)
+                                    {
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaComprobanteHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaTipoComprobanteAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 204, 255, 204);
+                                    }
+                                    else
+                                    {
+                                        //Esta mal el TIPO de COMPROBANTE
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, indiceColumnaComprobanteHolistor).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, indiceColumnaTipoComprobanteAFIP).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
+                                        worksheetArchivoHolistor.Cell(registroHolistor.Item1, ultimaColumnaHolistor + 1).Value += " TIPO COMPROBANTE esta mal";
+                                        worksheetArchivoAFIP.Cell(registroAFIP.Item1, ultimaColumnaAFIP + 1).Value += " TIPO COMPROBANTE esta mal";
+                                    }
                                 }
 
                             }
@@ -1055,7 +1181,7 @@ namespace Comparador
             }
         }
 
-        private async void MarcarNoSeñalizadosEnRojoHolistor(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelHolistor)
+        private async void MarcarNoSeñalizadosEnRojoHolistor(Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioAFIP, string rutaExcelHolistor)
         {
             using (var workbookHolistor = new XLWorkbook(rutaExcelHolistor))
             {
@@ -1112,7 +1238,7 @@ namespace Comparador
         }
 
         //Comparacion para los archivos de contabilidad que no son de Holistor
-        private async void CompararYMarcarFilasContabilidad(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioContabilidad, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelContabilidad, string rutaExcelAFIP,
+        private async void CompararYMarcarFilasContabilidad(Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioContabilidad, Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioAFIP, string rutaExcelContabilidad, string rutaExcelAFIP,
             int indiceColumnaCUIT, int indiceColumnaPuntoVenta, int indiceColumnaNumeroComprobante, int indiceColumnaTotal, int indiceColumnaIVA, int indiceColumnaFecha, double tolerancia)
         {
             // Primera comparacion
@@ -1131,7 +1257,7 @@ namespace Comparador
             MarcarNoSeñalizadosEnRojoContabilidad(diccionarioContabilidad, diccionarioAFIP, rutaExcelContabilidad, indiceColumnaPuntoVenta, indiceColumnaNumeroComprobante, indiceColumnaIVA, indiceColumnaTotal, indiceColumnaCUIT, indiceColumnaFecha);
         }
 
-        private async void CompararFechaImportesComprobanteContabilidad(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioContabilidad, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelContabilidad, string rutaExcelAFIP,
+        private async void CompararFechaImportesComprobanteContabilidad(Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioContabilidad, Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioAFIP, string rutaExcelContabilidad, string rutaExcelAFIP,
             int indiceColumnaCUIT, int indiceColumnaPuntoVenta, int indiceColumnaNumeroComprobante, int indiceColumnaTotal, int indiceColumnaIVA, int indiceColumnaFecha, double tolerancia)
         {
             using (var workbookContabilidad = new XLWorkbook(rutaExcelContabilidad))
@@ -1241,7 +1367,7 @@ namespace Comparador
             }
         }
 
-        private async void CompararFechaComprobanteContabilidad(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioContabilidad, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelContabilidad, string rutaExcelAFIP,
+        private async void CompararFechaComprobanteContabilidad(Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioContabilidad, Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioAFIP, string rutaExcelContabilidad, string rutaExcelAFIP,
             int indiceColumnaCUIT, int indiceColumnaPuntoVenta, int indiceColumnaNumeroComprobante, int indiceColumnaTotal, int indiceColumnaIVA, int indiceColumnaFecha, double tolerancia)
         {
             using (var workbookContabilidad = new XLWorkbook(rutaExcelContabilidad))
@@ -1366,7 +1492,7 @@ namespace Comparador
             }
         }
 
-        private async void CompararComprobanteContabilidad(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioContabilidad, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelContabilidad, string rutaExcelAFIP,
+        private async void CompararComprobanteContabilidad(Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioContabilidad, Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioAFIP, string rutaExcelContabilidad, string rutaExcelAFIP,
             int indiceColumnaCUIT, int indiceColumnaPuntoVenta, int indiceColumnaNumeroComprobante, int indiceColumnaTotal, int indiceColumnaIVA, int indiceColumnaFecha, double tolerancia)
         {
             using (var workbookContabilidad = new XLWorkbook(rutaExcelContabilidad))
@@ -1515,7 +1641,7 @@ namespace Comparador
             }
         }
 
-        private async void CompararImportesContabilidad(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioContabilidad, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelContabilidad, string rutaExcelAFIP,
+        private async void CompararImportesContabilidad(Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioContabilidad, Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioAFIP, string rutaExcelContabilidad, string rutaExcelAFIP,
             int indiceColumnaCUIT, int indiceColumnaPuntoVenta, int indiceColumnaNumeroComprobante, int indiceColumnaTotal, int indiceColumnaIVA, int indiceColumnaFecha, double tolerancia)
         {
             using (var workbookContabilidad = new XLWorkbook(rutaExcelContabilidad))
@@ -1653,7 +1779,7 @@ namespace Comparador
             }
         }
 
-        private async void MarcarNoSeñalizadosEnRojoContabilidad(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioContabilidad, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelContabilidad, int indiceColumnaPuntoVenta, int indiceColumnaComprobante, int indiceColumnaIVA, int indiceColumnaTotal, int indiceColumnaCuit, int indiceColumnaFecha)
+        private async void MarcarNoSeñalizadosEnRojoContabilidad(Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioContabilidad, Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioAFIP, string rutaExcelContabilidad, int indiceColumnaPuntoVenta, int indiceColumnaComprobante, int indiceColumnaIVA, int indiceColumnaTotal, int indiceColumnaCuit, int indiceColumnaFecha)
         {
             using (var workbookContabilidad = new XLWorkbook(rutaExcelContabilidad))
             {
@@ -1705,7 +1831,7 @@ namespace Comparador
             }
         }
 
-        private async void MarcarNoSeñalizadosEnRojo(Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime)>> diccionarioAFIP, string rutaExcelAFIP)
+        private async void MarcarNoSeñalizadosEnRojo(Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioHolistor, Dictionary<string, List<(int, double, double, string, DateTime, int)>> diccionarioAFIP, string rutaExcelAFIP)
         {
             using (var workbookAFIP = new XLWorkbook(rutaExcelAFIP))
             {
@@ -1720,6 +1846,7 @@ namespace Comparador
                 int indiceColumnaTotalAFIP = ObtenerIndiceColumna(worksheet, "Imp. Total");
                 int indiceColumnaCuitAFIP = ObtenerIndiceColumna(worksheet, "Nro. Doc. Emisor");
                 int indiceColumnaFechaAFIP = ObtenerIndiceColumna(worksheet, "Fecha");
+                int indiceColumnaTipoComprobanteAFIP = ObtenerIndiceColumna(worksheet, "Tipo");
 
                 foreach (var row in worksheet.RowsUsed())
                 {
@@ -1735,7 +1862,9 @@ namespace Comparador
                         worksheet.Cell(row.RowNumber(), indiceColumnaCuitAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
                         worksheet.Cell(row.RowNumber(), indiceColumnaCuitAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 255, 204, 204) &&
                         worksheet.Cell(row.RowNumber(), indiceColumnaFechaAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
-                        worksheet.Cell(row.RowNumber(), indiceColumnaFechaAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 255, 204, 204))
+                        worksheet.Cell(row.RowNumber(), indiceColumnaFechaAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 255, 204, 204) &&
+                        worksheet.Cell(row.RowNumber(), indiceColumnaTipoComprobanteAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
+                        worksheet.Cell(row.RowNumber(), indiceColumnaTipoComprobanteAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 255, 204, 204))
                     {
                         string cuit = worksheet.Cell(row.RowNumber(), indiceColumnaCuitAFIP).GetString();
                         if (!diccionarioHolistor.ContainsKey(cuit))
@@ -1755,14 +1884,16 @@ namespace Comparador
                         worksheet.Cell(row.RowNumber(), indiceColumnaTotalAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 255, 204, 204) &&
                         worksheet.Cell(row.RowNumber(), indiceColumnaCuitAFIP).Style.Fill.BackgroundColor == XLColor.FromArgb(255, 204, 255, 204) &&
                         worksheet.Cell(row.RowNumber(), indiceColumnaFechaAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
-                        worksheet.Cell(row.RowNumber(), indiceColumnaFechaAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 255, 204, 204))
+                        worksheet.Cell(row.RowNumber(), indiceColumnaFechaAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 255, 204, 204) &&
+                        worksheet.Cell(row.RowNumber(), indiceColumnaTipoComprobanteAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 204, 255, 204) &&
+                        worksheet.Cell(row.RowNumber(), indiceColumnaTipoComprobanteAFIP).Style.Fill.BackgroundColor != XLColor.FromArgb(255, 255, 204, 204))
                     {
                         worksheet.Row(row.RowNumber()).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 255, 204, 204);
                         worksheet.Cell(row.RowNumber(), ultimaColumnaAFIP + 1).Value = "NO coincide ningun registro";
                     }
                 }
 
-                workbookAFIP.Save();
+                workbookAFIP.SaveAs(rutaExcelAFIP);
             }
         }
 
