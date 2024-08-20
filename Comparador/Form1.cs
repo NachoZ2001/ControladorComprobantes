@@ -592,9 +592,9 @@ namespace Comparador
                         string stringFechaArchivo1 = worksheet.Cell(fila, indiceColumnaFecha).GetString();
                         DateTime fechaArchivo1 = DateTime.Parse(stringFechaArchivo1);
 
-                        // Obtener el valor mapeado del tipo de comprobante
+                        // Obtener el valor mapeado del tipo de comprobante                      
                         int tipoMapeado = ExtraerTipoFacturaAFIP(worksheet.Cell(fila, indiceColumnaTipo).GetString());
-
+                        
                         // Agregar al diccionario
                         if (!diccionario.ContainsKey(cuit))
                         {
