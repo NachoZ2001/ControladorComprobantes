@@ -44,12 +44,15 @@
             buttonCancelar = new Button();
             textBoxFecha = new TextBox();
             numericUpDownFecha = new NumericUpDown();
+            numericUpDownFilaEncabezado = new NumericUpDown();
+            textBoxFilaEncabezado = new TextBox();
             ((System.ComponentModel.ISupportInitialize)numericUpDownCuit).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownPuntoVenta).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownNumeroComprobante).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownIVA).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownTotal).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownFecha).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownFilaEncabezado).BeginInit();
             SuspendLayout();
             // 
             // numericUpDownCuit
@@ -215,7 +218,7 @@
             buttonGuardar.FlatStyle = FlatStyle.Flat;
             buttonGuardar.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             buttonGuardar.ForeColor = SystemColors.ButtonFace;
-            buttonGuardar.Location = new Point(164, 305);
+            buttonGuardar.Location = new Point(164, 339);
             buttonGuardar.Name = "buttonGuardar";
             buttonGuardar.Size = new Size(75, 23);
             buttonGuardar.TabIndex = 12;
@@ -229,7 +232,7 @@
             buttonCancelar.FlatStyle = FlatStyle.Flat;
             buttonCancelar.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             buttonCancelar.ForeColor = SystemColors.ButtonFace;
-            buttonCancelar.Location = new Point(70, 305);
+            buttonCancelar.Location = new Point(70, 339);
             buttonCancelar.Name = "buttonCancelar";
             buttonCancelar.Size = new Size(75, 23);
             buttonCancelar.TabIndex = 13;
@@ -263,12 +266,40 @@
             numericUpDownFecha.TextAlign = HorizontalAlignment.Center;
             numericUpDownFecha.Value = new decimal(new int[] { 1, 0, 0, int.MinValue });
             // 
+            // numericUpDownFilaEncabezado
+            // 
+            numericUpDownFilaEncabezado.BackColor = Color.BlueViolet;
+            numericUpDownFilaEncabezado.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            numericUpDownFilaEncabezado.ForeColor = SystemColors.ButtonFace;
+            numericUpDownFilaEncabezado.Location = new Point(163, 293);
+            numericUpDownFilaEncabezado.Minimum = new decimal(new int[] { 100, 0, 0, int.MinValue });
+            numericUpDownFilaEncabezado.Name = "numericUpDownFilaEncabezado";
+            numericUpDownFilaEncabezado.Size = new Size(120, 23);
+            numericUpDownFilaEncabezado.TabIndex = 16;
+            numericUpDownFilaEncabezado.TextAlign = HorizontalAlignment.Center;
+            numericUpDownFilaEncabezado.Value = new decimal(new int[] { 1, 0, 0, int.MinValue });
+            // 
+            // textBoxFilaEncabezado
+            // 
+            textBoxFilaEncabezado.BackColor = Color.BlueViolet;
+            textBoxFilaEncabezado.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            textBoxFilaEncabezado.ForeColor = SystemColors.ButtonFace;
+            textBoxFilaEncabezado.Location = new Point(12, 293);
+            textBoxFilaEncabezado.Name = "textBoxFilaEncabezado";
+            textBoxFilaEncabezado.ReadOnly = true;
+            textBoxFilaEncabezado.Size = new Size(133, 23);
+            textBoxFilaEncabezado.TabIndex = 17;
+            textBoxFilaEncabezado.Text = "Fila encabezado";
+            textBoxFilaEncabezado.TextAlign = HorizontalAlignment.Center;
+            // 
             // FormColumnas
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Purple;
-            ClientSize = new Size(303, 353);
+            ClientSize = new Size(305, 394);
+            Controls.Add(textBoxFilaEncabezado);
+            Controls.Add(numericUpDownFilaEncabezado);
             Controls.Add(numericUpDownFecha);
             Controls.Add(textBoxFecha);
             Controls.Add(buttonCancelar);
@@ -294,6 +325,7 @@
             ((System.ComponentModel.ISupportInitialize)numericUpDownIVA).EndInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownTotal).EndInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDownFecha).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDownFilaEncabezado).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -316,5 +348,7 @@
         private Button buttonCancelar;
         private TextBox textBoxFecha;
         private NumericUpDown numericUpDownFecha;
+        private NumericUpDown numericUpDownFilaEncabezado;
+        private TextBox textBoxFilaEncabezado;
     }
 }

@@ -45,7 +45,7 @@ namespace Comparador
 
                         // Crear un nuevo objeto Esquema con el nombre y las columnas seleccionadas
                         EsquemaColumnas esquema = new EsquemaColumnas(nombreEsquema, (int)numericUpDownCuit.Value, (int)numericUpDownPuntoVenta.Value,
-                            (int)numericUpDownNumeroComprobante.Value, (int)numericUpDownIVA.Value, (int)numericUpDownTotal.Value, (int)numericUpDownFecha.Value);
+                            (int)numericUpDownNumeroComprobante.Value, (int)numericUpDownIVA.Value, (int)numericUpDownTotal.Value, (int)numericUpDownFecha.Value, (int)numericUpDownFilaEncabezado.Value);
 
                         // Ruta del archivo Esquemas en el directorio de la aplicación
                         string filePath = Path.Combine(Application.StartupPath, "Esquemas.txt");
@@ -116,7 +116,7 @@ namespace Comparador
                 {
                     // Crear un nuevo objeto Esquema con el nombre y las columnas seleccionadas
                     EsquemaColumnas esquema = new EsquemaColumnas(NombreEsquema, (int)numericUpDownCuit.Value, (int)numericUpDownPuntoVenta.Value,
-                        (int)numericUpDownNumeroComprobante.Value, (int)numericUpDownIVA.Value, (int)numericUpDownTotal.Value, (int)numericUpDownFecha.Value);
+                        (int)numericUpDownNumeroComprobante.Value, (int)numericUpDownIVA.Value, (int)numericUpDownTotal.Value, (int)numericUpDownFecha.Value, (int)numericUpDownFilaEncabezado.Value);
 
                     // Eliminar el esquema existente de la lista
                     esquemasExistentes.Remove(esquemaExistente);
@@ -164,7 +164,7 @@ namespace Comparador
             this.Close();
         }
 
-        public void cargarDatos(int IndiceColumnaCuit, int IndiceColumnaIVA, int IndiceColumnaTotal, int IndiceColumnaPuntoVenta, int IndiceColumnaComprobante, string nombre, int IndiceColumnaFecha)
+        public void cargarDatos(int IndiceColumnaCuit, int IndiceColumnaIVA, int IndiceColumnaTotal, int IndiceColumnaPuntoVenta, int IndiceColumnaComprobante, string nombre, int IndiceColumnaFecha,  int indiceFilaEncabezado)
         {
             numericUpDownCuit.Value = IndiceColumnaCuit;
             numericUpDownIVA.Value = IndiceColumnaIVA;
@@ -173,6 +173,7 @@ namespace Comparador
             numericUpDownNumeroComprobante.Value = IndiceColumnaComprobante;
             this.NombreEsquema = nombre;
             numericUpDownFecha.Value = IndiceColumnaFecha;
+            numericUpDownFilaEncabezado.Value = indiceFilaEncabezado;
         }
 
         private void FormColumnas_Load(object sender, EventArgs e)
@@ -195,10 +196,11 @@ namespace Comparador
         public int IndiceColumnaIVA { get; set; }
         public int IndiceColumnaTotal { get; set; }
         public int IndiceColumnaFecha { get; set; }
+        public int IndiceColumnaFilaEncabezado { get; set; }
 
         public EsquemaColumnas() { }
 
-        public EsquemaColumnas(string nombre, int indiceCuit, int indicePuntoVenta, int indiceNumeroComprobante, int indiceIVA, int indiceTotal, int indiceFecha)
+        public EsquemaColumnas(string nombre, int indiceCuit, int indicePuntoVenta, int indiceNumeroComprobante, int indiceIVA, int indiceTotal, int indiceFecha, int indiceFilaEncabezado)
         {
             Nombre = nombre;
             IndiceColumnaCuit = indiceCuit;
@@ -207,6 +209,7 @@ namespace Comparador
             IndiceColumnaIVA = indiceIVA;
             IndiceColumnaTotal = indiceTotal;
             IndiceColumnaFecha = indiceFecha;
+            IndiceColumnaFilaEncabezado = indiceFilaEncabezado;
         }
     }
 
