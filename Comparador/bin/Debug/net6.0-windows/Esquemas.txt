@@ -1,2 +1,3 @@
-{"Nombre":"Cooperativa","IndiceColumnaCuit":8,"IndiceColumnaPuntoVenta":4,"IndiceColumnaComprobante":5,"IndiceColumnaIVA":10,"IndiceColumnaTotal":12,"IndiceColumnaFecha":1, "IndiceColumnaFilaEncabezado":2}
+{"Nombre":"Cooperativa","IndiceColumnaCuit":8,"IndiceColumnaPuntoVenta":4,"IndiceColumnaComprobante":5,"IndiceColumnaIVA":10,"IndiceColumnaTotal":12,"IndiceColumnaFecha":1,"IndiceColumnaFilaEncabezado":2}
 {"Nombre":"Holistor","IndiceColumnaCuit":4,"IndiceColumnaPuntoVenta":-1,"IndiceColumnaComprobante":2,"IndiceColumnaIVA":6,"IndiceColumnaTotal":11,"IndiceColumnaFecha":1,"IndiceColumnaFilaEncabezado":7}
+{"Nombre":"Tango","IndiceColumnaCuit":5,"IndiceColumnaPuntoVenta":-1,"IndiceColumnaComprobante":7,"IndiceColumnaIVA":11,"IndiceColumnaTotal":12,"IndiceColumnaFecha":1,"IndiceColumnaFilaEncabezado":1}

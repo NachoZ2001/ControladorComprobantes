@@ -26,3 +26,31 @@ C:\Program Files\Sublime Merge\ComparadorEli\Comparador\obj\Debug\net6.0-windows
 C:\Program Files\Sublime Merge\ComparadorEli\Comparador\bin\Debug\net6.0-windows\Newtonsoft.Json.dll
 C:\Program Files\Sublime Merge\ComparadorEli\Comparador\obj\Debug\net6.0-windows\Comparador.sourcelink.json
 C:\Program Files\Sublime Merge\ComparadorEli\Comparador\obj\Debug\net6.0-windows\Comparador.csproj.Up2Date
+C:\Proyectos\ComparadorEli\Comparador\bin\Debug\net6.0-windows\Comparador.exe
+C:\Proyectos\ComparadorEli\Comparador\bin\Debug\net6.0-windows\Comparador.deps.json
+C:\Proyectos\ComparadorEli\Comparador\bin\Debug\net6.0-windows\Comparador.runtimeconfig.json
+C:\Proyectos\ComparadorEli\Comparador\bin\Debug\net6.0-windows\Comparador.dll
+C:\Proyectos\ComparadorEli\Comparador\bin\Debug\net6.0-windows\Comparador.pdb
+C:\Proyectos\ComparadorEli\Comparador\bin\Debug\net6.0-windows\ClosedXML.dll
+C:\Proyectos\ComparadorEli\Comparador\bin\Debug\net6.0-windows\DocumentFormat.OpenXml.dll
+C:\Proyectos\ComparadorEli\Comparador\bin\Debug\net6.0-windows\ExcelNumberFormat.dll
+C:\Proyectos\ComparadorEli\Comparador\bin\Debug\net6.0-windows\Irony.dll
+C:\Proyectos\ComparadorEli\Comparador\bin\Debug\net6.0-windows\Newtonsoft.Json.dll
+C:\Proyectos\ComparadorEli\Comparador\bin\Debug\net6.0-windows\SixLabors.Fonts.dll
+C:\Proyectos\ComparadorEli\Comparador\bin\Debug\net6.0-windows\XLParser.dll
+C:\Proyectos\ComparadorEli\Comparador\obj\Debug\net6.0-windows\Comparador.csproj.AssemblyReference.cache
+C:\Proyectos\ComparadorEli\Comparador\obj\Debug\net6.0-windows\Comparador.Form1.resources
+C:\Proyectos\ComparadorEli\Comparador\obj\Debug\net6.0-windows\Comparador.FormColumnas.resources
+C:\Proyectos\ComparadorEli\Comparador\obj\Debug\net6.0-windows\Comparador.Properties.Resources.resources
+C:\Proyectos\ComparadorEli\Comparador\obj\Debug\net6.0-windows\Comparador.csproj.GenerateResource.cache
+C:\Proyectos\ComparadorEli\Comparador\obj\Debug\net6.0-windows\Comparador.GeneratedMSBuildEditorConfig.editorconfig
+C:\Proyectos\ComparadorEli\Comparador\obj\Debug\net6.0-windows\Comparador.AssemblyInfoInputs.cache
+C:\Proyectos\ComparadorEli\Comparador\obj\Debug\net6.0-windows\Comparador.AssemblyInfo.cs
+C:\Proyectos\ComparadorEli\Comparador\obj\Debug\net6.0-windows\Comparador.csproj.CoreCompileInputs.cache
+C:\Proyectos\ComparadorEli\Comparador\obj\Debug\net6.0-windows\Comparador.sourcelink.json
+C:\Proyectos\ComparadorEli\Comparador\obj\Debug\net6.0-windows\Comparador.csproj.Up2Date
+C:\Proyectos\ComparadorEli\Comparador\obj\Debug\net6.0-windows\Comparador.dll
+C:\Proyectos\ComparadorEli\Comparador\obj\Debug\net6.0-windows\refint\Comparador.dll
+C:\Proyectos\ComparadorEli\Comparador\obj\Debug\net6.0-windows\Comparador.pdb
+C:\Proyectos\ComparadorEli\Comparador\obj\Debug\net6.0-windows\Comparador.genruntimeconfig.cache
+C:\Proyectos\ComparadorEli\Comparador\obj\Debug\net6.0-windows\ref\Comparador.dll
