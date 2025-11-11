@@ -43,13 +43,13 @@ namespace Comparador
 
             IndiceColumnaComprobanteAFIP = 4;
 
-            IndiceColumnaIVAAFIP = 16;
+            IndiceColumnaIVAAFIP = 29;
 
-            IndiceColumnaTotalAFIP = 17;
+            IndiceColumnaTotalAFIP = 30;
 
-            IndiceColumnaTipoCambioAFIP = 10;
+            IndiceColumnaTipoCambioAFIP = 12;
 
-            IndiceColumnaMonedaAFIP = 11;
+            IndiceColumnaMonedaAFIP = 13;
 
             IndiceColumnaCuitAFIP = 8;
             

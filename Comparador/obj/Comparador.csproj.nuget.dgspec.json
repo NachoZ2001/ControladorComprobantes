@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Proyectos\\ComparadorEli\\Comparador\\Comparador.csproj": {}
+    "C:\\Proyectos\\-Administración\\ControladorComprobantes\\Comparador\\Comparador.csproj": {}
   },
   "projects": {
-    "C:\\Proyectos\\ComparadorEli\\Comparador\\Comparador.csproj": {
+    "C:\\Proyectos\\-Administración\\ControladorComprobantes\\Comparador\\Comparador.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Proyectos\\ComparadorEli\\Comparador\\Comparador.csproj",
+        "projectUniqueName": "C:\\Proyectos\\-Administración\\ControladorComprobantes\\Comparador\\Comparador.csproj",
         "projectName": "Comparador",
-        "projectPath": "C:\\Proyectos\\ComparadorEli\\Comparador\\Comparador.csproj",
-        "packagesPath": "C:\\Users\\IgnacioZbrun\\.nuget\\packages\\",
-        "outputPath": "C:\\Proyectos\\ComparadorEli\\Comparador\\obj\\",
+        "projectPath": "C:\\Proyectos\\-Administración\\ControladorComprobantes\\Comparador\\Comparador.csproj",
+        "packagesPath": "C:\\Users\\IGNA ROSSI\\.nuget\\packages\\",
+        "outputPath": "C:\\Proyectos\\-Administración\\ControladorComprobantes\\Comparador\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\IgnacioZbrun\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\IGNA ROSSI\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -39,7 +43,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net6.0-windows7.0": {
@@ -65,24 +70,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[6.0.35, 6.0.35]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[6.0.35, 6.0.35]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[6.0.35, 6.0.35]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[6.0.35, 6.0.35]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
@@ -91,7 +78,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300\\RuntimeIdentifierGraph.json"
         }
       }
     }

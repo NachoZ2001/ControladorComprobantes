@@ -1,0 +1,12 @@
+C:\PublicacionComparador\Comparador.exe
+C:\PublicacionComparador\Comparador.dll
+C:\PublicacionComparador\Comparador.deps.json
+C:\PublicacionComparador\Comparador.runtimeconfig.json
+C:\PublicacionComparador\Comparador.pdb
+C:\PublicacionComparador\ClosedXML.dll
+C:\PublicacionComparador\DocumentFormat.OpenXml.dll
+C:\PublicacionComparador\ExcelNumberFormat.dll
+C:\PublicacionComparador\Irony.dll
+C:\PublicacionComparador\Newtonsoft.Json.dll
+C:\PublicacionComparador\SixLabors.Fonts.dll
+C:\PublicacionComparador\XLParser.dll
